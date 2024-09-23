@@ -12,6 +12,5 @@
         output="screen"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/planning.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/tf.launch.xml"/>
-    <include file="$(find-pkg-share autorobo_launch)/launch/common/bridge.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/start_rviz.launch.xml"/>
 </launch>
