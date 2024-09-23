@@ -1,0 +1,7 @@
+<launch>
+    <node
+        pkg="rviz2"
+        exec="rviz2"
+        args="-d $(find-pkg-share autorobo_launch)/rviz/autorobo.rviz"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/marker.launch.xml" />
+</launch>

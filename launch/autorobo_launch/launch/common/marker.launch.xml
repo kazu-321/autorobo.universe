@@ -1,0 +1,7 @@
+<launch>
+  <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/robot_area.launch.xml" />
+  <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/movable_area.launch.xml" />
+  <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/field_area.launch.xml" />
+  <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/start_right_area.launch.xml" />
+  <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/start_left_area.launch.xml" />
+</launch>

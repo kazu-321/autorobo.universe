@@ -1,0 +1,20 @@
+<launch>
+    <node
+        pkg="autorobo_planner"
+        exec="planner_node"
+        output="screen">
+        <param from="$(find-pkg-share autorobo_launch)/params/planner.yaml"/>
+    </node>
+    <node
+        pkg="autorobo_control"
+        exec="control_node"
+        output="screen">
+        <param from="$(find-pkg-share autorobo_launch)/params/control.yaml"/>
+    </node>
+    <node
+        pkg="autorobo_behavior"
+        exec="behavior_node"
+        output="screen">
+        <param name="bt_file" value="$(find-pkg-share autorobo_launch)/params/behavior.yaml"/>
+    </node>
+</launch>

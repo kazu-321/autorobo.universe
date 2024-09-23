@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find-pkg-share domain_bridge)/launch/domain_bridge.launch.xml">
+        <arg name="config" value="$(find-pkg-share autorobo_launch)/config/bridge.yaml"/>
+        <arg name="from_domain" value="2" />
+        <arg name="to_domain" value="1" />
+    </include>
+</launch>

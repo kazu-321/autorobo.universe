@@ -1,0 +1,6 @@
+<launch>
+    <node
+        pkg="autorobo_localization"
+        exec="ransac_node"
+        output="screen"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/ydlidar.launch.py"/>
