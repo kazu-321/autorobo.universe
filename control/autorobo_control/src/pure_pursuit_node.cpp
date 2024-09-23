@@ -27,6 +27,7 @@ public:
 
 private:
     void timer_callback(){
+        geometry_msgs::msg::PoseStamped pose;
         try{
             // Get current pose
             geometry_msgs::msg::TransformStamped transform = tf_buffer_->lookupTransform("map", "base_link", tf2::TimePointZero);
