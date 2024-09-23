@@ -13,9 +13,9 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='kazubuntu-wsl',
+    maintainer='kazu',
     maintainer_email='kzs321kzs@gmail.com',
-    description='TODO: Package description',
+    description='Behavior package for autorobo',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
