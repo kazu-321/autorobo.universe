@@ -1,0 +1,14 @@
+robot_area:
+  ros__parameters:
+    frame_id: "base_link"
+    namespace: "robot_area"
+    marker.id: 0
+    marker.scale: 0.1
+    marker.color.r: 0.0
+    marker.color.g: 1.0
+    marker.color.b: 0.0
+    marker.color.a: 1.0
+    area.x: [0.5,-0.5]
+    area.y: [0.5,-0.5]
+    area.z: 0.0
+    publsih_rate_ms: 50

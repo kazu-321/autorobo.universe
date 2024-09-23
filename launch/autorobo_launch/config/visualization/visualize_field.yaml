@@ -1,0 +1,16 @@
+visualize_field:
+  ros__parameters:
+    frame_id: field
+    marker.namespace: field
+    marker.id: 0
+    marker.scale: 0.001
+    marker.color.r: 0.87
+    marker.color.g: 0.72
+    marker.color.b: 0.52
+    marker.color.a: 1.0
+    marker.position.x: -0.15
+    marker.position.y: -0.15
+    marker.position.z: -0.1
+    marker.lifetime.sec: 0.0
+    marker.lifetime.nanosec: 0.0
+    publsih_rate_ms: 100

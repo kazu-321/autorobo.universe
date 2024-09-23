@@ -1,0 +1,13 @@
+visualize_robot:
+  ros__parameters:
+    frame_id: base_link
+    marker.namespace: robot
+    marker.id: 0
+    marker.scale: 1.0
+    marker.color.r: 0.8
+    marker.color.g: 0.8
+    marker.color.b: 0.8
+    marker.color.a: 1.0
+    marker.lifetime.sec: 0.0
+    marker.lifetime.nanosec: 0.0
+    publsih_rate_ms: 20

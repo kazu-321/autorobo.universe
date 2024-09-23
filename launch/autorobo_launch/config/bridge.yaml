@@ -1,0 +1,7 @@
+name: R1_bridge
+from_domain: 2
+to_domain: 1
+topics:
+  R1:
+    type: autorobo_msgs/msg/Twistring
+    remap: R1_bridge
