@@ -40,7 +40,6 @@ private:
             err_line.b=0.0;
             return err_line;
         }
-        Point best_right,best_left;
         int best_inliers=0;
         iter=this->get_parameter("iter").as_int();
         distance_threshold=this->get_parameter("distance_threshold").as_double();
@@ -51,7 +50,7 @@ private:
             double a=(p1.y-p2.y)/(p1.x-p2.x);
             double b=p1.y-a*p1.x;
             int inliers=0;
-            for(int j=0;j<data.size();j++){
+            for(size_t j=0;j<data.size();j++){
                 double d=fabs(a*data[j].x-data[j].y+b)/sqrt(a*a+1);
                 if(d<=distance_threshold){
                     inliers++;
@@ -74,7 +73,7 @@ private:
         best_wall.p1.y=-100.0;
         best_wall.p2.x= 100.0;
         best_wall.p2.y= 100.0;
-        for(int i=0;i<data.size();i++){
+        for(size_t i=0;i<data.size();i++){
             double d=fabs(a*data[i].x-data[i].y+b)/sqrt(a*a+1);
             if(d<=distance_threshold){
                 if(TB){
@@ -92,7 +91,7 @@ private:
     void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
         auto start_time=this->now();
         std::vector<Point> scan_points,robot_filter,side_wall,front_wall;
-        for(int i = 0; i < msg->ranges.size(); i++) {
+        for(size_t i = 0; i < msg->ranges.size(); i++) {
             if(msg->ranges[i] < msg->range_max) {
                 Point p;
                 p.x = msg->ranges[i] * cos(msg->angle_min + i * msg->angle_increment -M_PI/2)-0.5;
@@ -127,7 +126,7 @@ private:
 
         // get side scan
         double angle=M_PI/2-atan2(front.p1.y-front.p2.y,front.p1.x-front.p2.x);
-        for(int i=0;i<scan_points.size();i++){
+        for(size_t i=0;i<scan_points.size();i++){
             double d=fabs(front_ab.a*scan_points[i].x-scan_points[i].y+front_ab.b)/sqrt(front_ab.a*front_ab.a+1);
             if(d<=distance_threshold) front_wall.push_back(scan_points[i]);
             else                      side_wall.push_back(scan_points[i]);
