@@ -5,10 +5,13 @@
     <node
         pkg="tf2_ros"
         exec="static_transform_publisher"
-        args="0.0 0.0 0.0 0.0 0.0 0.0 0.0 map base_link_sim"/>
+        args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map base_link_sim"/>
+    <node
+        pkg="autorobo_localization"
+        exec="ransac_node"
+        output="screen"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/planning.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/tf.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/bridge.launch.xml"/>
-    <include file="$(find-pkg-share autorobo_launch)/launch/localization.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/start_rviz.launch.xml"/>
 </launch>

@@ -1,5 +1,5 @@
 #include "rclcpp/rclcpp.hpp"
-#include "twistring/msg/twistring.hpp"
+#include "autorobo_msgs/msg/twistring.hpp"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
 #include "tf2_ros/transform_broadcaster.h"
@@ -13,8 +13,8 @@
 
 class OmniSim : public rclcpp::Node {
 public:
-    OmniSim() : Node("omni_sim_node") ,count_(0),old_z_(0.0),x_(0.0),y_(0.0),z_(0.0) {
-        twistring_subscriber_= this->create_subscription<twistring::msg::Twistring>("/R1", 10, 
+    OmniSim() : Node("omni_sim_node") ,count_(0),old_x_(0.0),old_y_(0.0),old_z_(0.0),x_(0.0),y_(0.0),z_(0.0) {
+        twistring_subscriber_= this->create_subscription<autorobo_msgs::msg::Twistring>("/R1", 10, 
                               std::bind(&OmniSim::velocityCallback, this, std::placeholders::_1));
         lidar_pub_          = this->create_publisher<sensor_msgs::msg::LaserScan>("/scan", rclcpp::SensorDataQoS());
         tf_broadcaster_     = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
@@ -30,7 +30,7 @@ public:
     }
 
 private:
-    void velocityCallback(const twistring::msg::Twistring::SharedPtr msg) {
+    void velocityCallback(const autorobo_msgs::msg::Twistring::SharedPtr msg) {
         count_++;
         twist_sum_.linear.x+=msg->twist.linear.x  *1.5;
         twist_sum_.linear.y+=msg->twist.linear.y  *1.5;
@@ -129,7 +129,7 @@ private:
         lidar_pub_->publish(scan);
     }
 
-    rclcpp::Subscription<twistring::msg::Twistring>::SharedPtr       twistring_subscriber_;
+    rclcpp::Subscription<autorobo_msgs::msg::Twistring>::SharedPtr       twistring_subscriber_;
     rclcpp::Publisher   <sensor_msgs::msg::LaserScan>::SharedPtr     lidar_pub_;
     std::unique_ptr     <tf2_ros::TransformBroadcaster>              tf_broadcaster_;
     rclcpp::Publisher   <geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
@@ -137,8 +137,8 @@ private:
     rclcpp::TimerBase::SharedPtr timer_lidar_;
     geometry_msgs::msg::Twist twist_sum_;
     int count_;
-    double x_, y_, z_;
     double old_x_, old_y_, old_z_;
+    double x_, y_, z_;
     double lidar_err_;
     bool sig_;
     bool servo_[2];

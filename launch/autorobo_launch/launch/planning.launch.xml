@@ -7,7 +7,7 @@
     </node>
     <node
         pkg="autorobo_control"
-        exec="control_node"
+        exec="pure_pursuit_node"
         output="screen">
         <param from="$(find-pkg-share autorobo_launch)/params/control.yaml"/>
     </node>
@@ -15,6 +15,6 @@
         pkg="autorobo_behavior"
         exec="behavior_node"
         output="screen">
-        <param name="bt_file" value="$(find-pkg-share autorobo_launch)/params/behavior.yaml"/>
+        <param name="bt_file" value="$(find-pkg-share autorobo_launch)/params/bt/default.bt"/>
     </node>
 </launch>

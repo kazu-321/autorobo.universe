@@ -13,9 +13,9 @@ find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
   
-add_executable(ransac src/ransac_node.cpp)
-target_compile_features(ransac PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(ransac
+add_executable(ransac_node src/ransac_node.cpp)
+target_compile_features(ransac_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+ament_target_dependencies(ransac_node
   rclcpp
   sensor_msgs
   geometry_msgs
@@ -23,7 +23,7 @@ ament_target_dependencies(ransac
   tf2_ros)
 
 install(TARGETS
-  ransac
+  ransac_node
   DESTINATION lib/${PROJECT_NAME})
 
 

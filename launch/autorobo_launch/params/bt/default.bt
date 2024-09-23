@@ -1,0 +1,55 @@
+// 開始ー＞サーボ閉
+send s 0 0
+send s 1 0
+
+// 射出場所へ移動
+wait_ok         // wait OK: pos C1
+goto 1.8 1.9    // go to C1 pos
+
+// 子機1射出
+wait_ok         // wait OK: inj C1
+send s 0 1
+
+// 親機射出用壁当て
+wait_ok         // wait OK: hit wall
+forward on
+wait_ok         // wait OK: inj P
+send s 1 1      // process: 9
+
+// 打ったら1秒待ち壁当て終了
+wait 1          // margin(1s)
+forward off     // process: 11
+
+// 親機射出終了後サーボ閉
+send s 0 0
+send s 1 0
+
+goto home       // go home(1)
+// → 装填
+
+// 移動
+wait_ok         // wait OK: charge C2
+goto c2         // go to C2 pos
+
+// 子機2射出
+wait_ok         // wait OK: inj C2
+send s 0 1      // process: 18
+
+// ちょい待ち後ホームで装填
+wait 1          // mergin(1s)
+send s 0 0      // process:20
+
+goto home       // go home(2)
+
+// 移動
+wait_ok         // wait OK: charge C3
+goto c3         // go to C3 pos
+
+wait_ok         // wait OK: inj C3
+send s 0 1
+
+// 0.5秒待ってサーボを閉じて戻る
+wait 1        // margin(1s)
+send s 0 0
+send s 1 0
+goto home       // go home

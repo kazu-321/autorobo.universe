@@ -1,0 +1,8 @@
+<launch>
+    <node
+        pkg="autorobo_visualization"
+        exec="visualize_lines_node"
+        name="movable_area">
+        <param from="$(find-pkg-share autorobo_launch)/config/visualize/movable_area.yaml"/>
+    </node>
+</launch>

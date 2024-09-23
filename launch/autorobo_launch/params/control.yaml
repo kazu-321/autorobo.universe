@@ -1,0 +1,7 @@
+control_node:
+  ros__parameters:
+    frequency: 20.0
+    look_ahead_distance: 0.5
+    position_min_speed: 0.13
+    angle_p: 2.0
+    angle_min_speed: 0.05

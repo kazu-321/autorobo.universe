@@ -1,0 +1,11 @@
+<launch>    
+    <arg name="robot_3d_model_path" default="$(find-pkg-share autorobo_launch)/model3d/robot.stl"/>
+
+    <!-- show robot -->
+    <node pkg="autorobo_visualization" exec="visualize_stl_node" name="visualize_robot" >
+        <remap from="output/maker" to="/visualize/robot"/>
+        <param from="$(find-pkg-share autorobo_launch)/config/visualization/visualize_robot.yaml"/>
+        <param name="marker.meshpath" value="$(var robot_3d_model_path)"/>
+    </node>
+
+</launch>
