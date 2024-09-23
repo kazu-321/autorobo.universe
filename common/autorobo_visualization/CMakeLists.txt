@@ -9,8 +9,8 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(visualization_msgs REQUIRED)
 
-add_executable(visualize_stl src/visualize_stl.cpp)
-add_executable(visualize_lines src/visualize_lines.cpp)
+add_executable(visualize_stl src/visualize_stl_node.cpp)
+add_executable(visualize_lines src/visualize_lines_node.cpp)
 target_compile_features(visualize_stl PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 target_compile_features(visualize_lines PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 
