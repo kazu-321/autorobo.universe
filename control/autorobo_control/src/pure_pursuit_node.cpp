@@ -112,9 +112,9 @@ private:
         if(speed_lookahead_) speed = look_ahead_pose.position.z + position_min_speed_;
 
         // path_の最後とcurrentの差
-        double diff_goalx = path_.poses.back().position.x - current_x;
-        double diff_goaly = path_.poses.back().position.y - current_y;
-        double diff_goalz = get_yaw(path_.poses.back().orientation) - yaw;
+        // double diff_goalx = path_.poses.back().position.x - current_x;
+        // double diff_goaly = path_.poses.back().position.y - current_y;
+        // double diff_goalz = get_yaw(path_.poses.back().orientation) - yaw;
 
         geometry_msgs::msg::Twist cmd_vel;
         // 速度を計算
