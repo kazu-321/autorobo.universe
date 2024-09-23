@@ -4,7 +4,7 @@
   <name>autorobo_behavior</name>
   <version>0.0.0</version>
   <description>Behavior package for autorobo</description>
-  <maintainer email="kzs321kzs@gmail.com">kazubuntu-wsl</maintainer>
+  <maintainer email="kzs321kzs@gmail.com">kazu</maintainer>
   <license>Apache-2.0</license>
 
   <test_depend>ament_copyright</test_depend>
