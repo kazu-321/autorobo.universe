@@ -15,5 +15,4 @@ ament_auto_package(
   model3d
   params
   rviz
-  map
 )

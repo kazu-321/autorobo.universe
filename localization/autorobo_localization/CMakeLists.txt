@@ -13,7 +13,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
   
-add_executable(ransac src/ransac.cpp)
+add_executable(ransac src/ransac_node.cpp)
 target_compile_features(ransac PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
 ament_target_dependencies(ransac
   rclcpp
