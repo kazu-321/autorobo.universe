@@ -3,6 +3,6 @@
         pkg="autorobo_visualization"
         exec="visualize_lines_node"
         name="start_right_area">
-        <param from="$(find-pkg-share autorobo_launch)/config/visualize/start_right_area.yaml"/>
+        <param from="$(find-pkg-share autorobo_launch)/config/visualization/start_right_area.yaml"/>
     </node>
 </launch>

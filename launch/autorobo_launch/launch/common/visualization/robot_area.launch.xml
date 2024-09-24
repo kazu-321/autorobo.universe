@@ -3,6 +3,6 @@
         pkg="autorobo_visualization"
         exec="visualize_lines_node"
         name="robot_area">
-        <param from="$(find-pkg-share autorobo_launch)/config/visualize/robot_area.yaml"/>
+        <param from="$(find-pkg-share autorobo_launch)/config/visualization/robot_area.yaml"/>
     </node>
 </launch>

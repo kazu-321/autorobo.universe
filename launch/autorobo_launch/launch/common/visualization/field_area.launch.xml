@@ -3,6 +3,6 @@
         pkg="autorobo_visualization"
         exec="visualize_lines_node"
         name="field_area">
-        <param from="$(find-pkg-share autorobo_launch)/config/visualize/field_area.yaml"/>
+        <param from="$(find-pkg-share autorobo_launch)/config/visualization/field_area.yaml"/>
     </node>
 </launch>
