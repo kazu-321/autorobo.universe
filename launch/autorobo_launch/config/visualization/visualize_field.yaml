@@ -7,7 +7,7 @@ visualize_field:
     marker.color.r: 0.87
     marker.color.g: 0.72
     marker.color.b: 0.52
-    marker.color.a: 1.0
+    marker.color.a: 0.5
     marker.position.x: -0.15
     marker.position.y: -0.15
     marker.position.z: -0.1
