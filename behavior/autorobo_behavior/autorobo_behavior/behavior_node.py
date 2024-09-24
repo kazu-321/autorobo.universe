@@ -26,7 +26,7 @@ class BTNode(Node):
         self.nav_frag= True
         self.reached = False
         self.forward = False
-        self.team    = "blue"
+        self.team    = "red"
         self.process = 0
         self.counter = -1
         self.cmd     = Twistring()
