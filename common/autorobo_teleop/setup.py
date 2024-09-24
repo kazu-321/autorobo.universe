@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'teleop_key = autorobo_teleop.teleop_key:main'
+            'teleop_key = autorobo_teleop.teleop_key:main',
+            'backgound_key = autorobo_teleop.background_key:main'
         ],
     },
 )
