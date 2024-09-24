@@ -34,7 +34,7 @@ class teleop_key(Node):
             self.twistring=Twistring()
             if key=="w":
                 self.twistring.twist.linear.x=1.0
-            elif key=="s":
+            elif key=="x":
                 self.twistring.twist.linear.x=-1.0
             elif key=="a":
                 self.twistring.twist.linear.y=1.0
