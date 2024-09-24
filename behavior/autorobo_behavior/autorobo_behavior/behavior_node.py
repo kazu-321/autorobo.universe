@@ -10,7 +10,7 @@ import math
 
 class BTNode(Node):
     def __init__(self):
-        super().__init__('bt_node')
+        super().__init__('behavior_node')
         # pub/sub
         self.R1_pub  = self.create_publisher(Twistring, '/R1', 10)
         self.R1_sub  = self.create_subscription(Twistring, '/R1_control', self.R1_callback, 10)

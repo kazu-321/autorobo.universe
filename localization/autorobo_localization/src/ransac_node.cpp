@@ -8,10 +8,10 @@
 
 class ransac_node : public rclcpp::Node{
 public:
-    ransac_node() : Node("ransac") {
+    ransac_node() : Node("ransac_node") {
         pose_pub_     = this->create_publisher<geometry_msgs::msg::PoseStamped>("/localization/current_pose", 10);
-        line_pub_     = this->create_publisher<visualization_msgs::msg::Marker>("/ransac/line", 10);
-        cloud_pub_    = this->create_publisher<sensor_msgs::msg::PointCloud2>("/ransac/cloud", 10);
+        line_pub_     = this->create_publisher<visualization_msgs::msg::Marker>("/localization/ransac/line", 10);
+        cloud_pub_    = this->create_publisher<sensor_msgs::msg::PointCloud2>("/localization/ransac/cloud", 10);
         scan_sub_     = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", rclcpp::SensorDataQoS(), 
                         std::bind(&ransac_node::scan_callback, this, std::placeholders::_1));
         tf_broadcaster_  = std::make_unique<tf2_ros::TransformBroadcaster>(this);

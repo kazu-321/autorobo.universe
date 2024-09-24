@@ -7,7 +7,7 @@
 
 class pure_pursuit_node : public rclcpp::Node{
 public:
-    pure_pursuit_node() : Node("controller_node"){
+    pure_pursuit_node() : Node("pure_pursuit_node"){
         path_sub_      = this->create_subscription<geometry_msgs::msg::PoseArray>  ("/planning/path", 10,
                          std::bind(&pure_pursuit_node::path_callback, this, std::placeholders::_1));
         tf_buffer_     = std::make_shared         <tf2_ros::Buffer>                (this->get_clock());
