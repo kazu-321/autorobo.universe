@@ -13,4 +13,6 @@
     <include file="$(find-pkg-share autorobo_launch)/launch/planning.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/tf.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/start_rviz.launch.xml"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/visualize_field.launch.xml"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/visualize_robot.launch.xml"/>
 </launch>
