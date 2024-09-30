@@ -20,15 +20,24 @@ $ source install/setup.bash
 ## 実行
 terminal 0
 ```bash
-ros2 launch autorobo_launch sim.launch.xml
+$ ros2 launch autorobo_launch sim.launch.xml
 ```
 
 terminal 1
 ```bash
-ros2 run autorobo_teleop teleop_key
+$ ros2 run autorobo_teleop teleop_key
 ```
+teleopが起動したら、`c`キーを入力しロボットの電源を入れます
 
-terminal 1の操作方法
+terminal 0のsigが1になったら、
+
+`o`キーで自動運転を開始します
+
+安全のためロボット射出のタイミングなどで`o`キーの入力を必須にしています
+
+servoの0,1は射出機構のロックのon offを表しています
+
+### terminal 1の操作方法
 - cキー
 
         - コンティニュー
