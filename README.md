@@ -7,6 +7,8 @@
 # important!
 ライセンス整備がまだです！
 
+参考：[roboware-neo.universe](https://github.com/TakanoTaiga/roboware-neo.universe)
+
 ## ビルド
 ```bash
 $ # cd to your ws
