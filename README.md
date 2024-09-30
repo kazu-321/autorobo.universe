@@ -8,60 +8,52 @@
 ライセンス整備がまだです！
 
 ## ビルド
-```
-colcon build
+```bash
+$ # cd to your ws
+$ cd src
+$ git clone https://github.com/kazu-321/autorobo.universe
+$ cd ../
+$ colcon build
+$ source install/setup.bash
 ```
 
-## ファイル構成
+## 実行
+terminal 0
+```bash
+ros2 launch autorobo_launch sim.launch.xml
 ```
-autorobo.universe
-├── behavior / autorobo_behavior
-│       └── behavior_node
-│
-├── common
-│   ├── autorobo_teleop
-│   │       ├── background_key
-│   │       └── teleop_key
-│   │
-│   └── autorobo_visualization
-│           ├── visualize_lines_node
-│           └── visualize_stl_node
-│
-├── control / autorobo_control
-│       └── pure_pursuit_node
-│
-├── launch / autorobo_launch
-│   ├── launch
-│   │   ├── common
-│   │   │   ├── bridge.launch.xml
-│   │   │   ├── marker.launch.xml
-│   │   │   ├── start_rviz.launch.xml
-│   │   │   ├── tf.launch.xml
-│   │   │   └── visualization
-│   │   │       ├── field_area.launch.xml
-│   │   │       ├── movable_area.launch.xml
-│   │   │       ├── robot_area.launch.xml
-│   │   │       ├── start_left_area.launch.xml
-│   │   │       ├── start_right_area.launch.xml
-│   │   │       ├── visualize_field.launch.xml
-│   │   │       └── visualize_robot.launch.xml
-│   │   ├── localization.launch.xml
-│   │   ├── planning.launch.xml
-│   │   ├── sim.launch.xml
-│   │   └── ydlidar.launch.py
-│   └── model3d
-│       ├── field.stl
-│       └── robot.stl
-│
-├── localization / autorobo_localization
-│       └── ransac_node.cpp
-│
-├── message / autorobo_msgs
-│       └── Twistring.msg
-│
-├── planning / autorobo_planner
-│       └── planner_node.cpp
-│
-└── simulation / autorobo_simulation
-        └── simulation_node.cpp
+
+terminal 1
+```bash
+ros2 run autorobo_teleop teleop_key
 ```
+
+terminal 1の操作方法
+- cキー
+
+        - コンティニュー
+        - ロボコンのルールに基づいた遠隔非常停止解除用
+- pキー
+
+        - ポーズ
+        - サイドコンティニュー(c)すればロボットを動かせる
+- waxdキー
+
+        - 4方向移動
+        - nav offの状態じゃないと動けない
+- sキー
+
+        - ユーザー入力による移動ストップ
+- nキー
+
+        - 自動運転のon off切り替え用
+        - 最初はon
+- oキー
+
+        - 射出許可など自動運転時に安全のためにあるボタン
+        - コンティニュー&&自動運転on　ならパスが生成されたりする
+
+## 未検証
+- pynputを使用したバックグラウンドキー入力
+- rosbag関係のlaunch
+- 実際に使用した慣性モデル付きのシミュレーター
