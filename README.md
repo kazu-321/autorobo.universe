@@ -9,6 +9,10 @@
 
 参考：[roboware-neo.universe](https://github.com/TakanoTaiga/roboware-neo.universe)
 
+
+https://github.com/user-attachments/assets/9e46a454-ef7c-4904-bd03-819eaf67d2a9
+
+
 ## ビルド
 ```bash
 $ # cd to your ws
@@ -21,6 +25,7 @@ $ source install/setup.bash
 
 ## 実行
 terminal 0
+
 ```bash
 $ ros2 launch autorobo_launch sim.launch.xml
 ```
