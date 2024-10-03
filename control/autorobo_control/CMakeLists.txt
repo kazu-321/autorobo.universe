@@ -10,6 +10,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
+find_package(visualization_msgs REQUIRED)
 
 add_executable(pure_pursuit_node src/pure_pursuit_node.cpp)
 target_compile_features(pure_pursuit_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
@@ -17,7 +18,8 @@ target_compile_features(pure_pursuit_node PUBLIC c_std_99 cxx_std_17)  # Require
 ament_target_dependencies(pure_pursuit_node
   rclcpp
   geometry_msgs
-  tf2_ros)
+  tf2_ros
+  visualization_msgs)
 
 install(TARGETS pure_pursuit_node
   DESTINATION lib/${PROJECT_NAME})

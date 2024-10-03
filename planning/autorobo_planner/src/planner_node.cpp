@@ -16,6 +16,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
+#include "visualization_msgs/msg/marker.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include <tf2_ros/transform_listener.h>
 #include <tf2_ros/buffer.h>
@@ -23,7 +24,7 @@
 class PlannerNode : public rclcpp::Node{
 public:
     PlannerNode() : Node("planner_node"){
-        path_pub_    = this->create_publisher<geometry_msgs::msg::PoseArray>("/planning/path", 10);
+        path_pub_    = this->create_publisher<visualization_msgs::msg::Marker>("/planning/path", 10);
         goal_sub_    = this->create_subscription<geometry_msgs::msg::PoseStamped>("/goal_pose", 10,
                        std::bind(&PlannerNode::goal_callback, this, std::placeholders::_1));
         goal_pub_    = this->create_publisher<geometry_msgs::msg::PoseStamped>("/planning/goal", 10);
@@ -95,8 +96,16 @@ private:
         zero_stop_ = this->get_parameter("zero_stop").as_double();
         v_max      = this->get_parameter("v_max").as_double();
         
-        geometry_msgs::msg::PoseArray path;
-        path.header = goal.header;
+        visualization_msgs::msg::Marker path;
+        path.action = visualization_msgs::msg::Marker::ADD;
+        path.type = visualization_msgs::msg::Marker::LINE_STRIP;
+        path.header.frame_id = "map";
+        path.header.stamp = this->now();
+        path.ns = "path";
+        path.id = 0;
+        path.scale.x = 0.1;
+        path.color.a = 1.0;
+
         double x= goal.pose.position.x - current_pose_.position.x;
         double y= goal.pose.position.y - current_pose_.position.y;
         double distance = std::sqrt(x*x + y*y); // 距離
@@ -117,19 +126,17 @@ private:
         if(std::abs(x)<position_tolerance_/100.0 && std::abs(y)<position_tolerance_/100.0 && std::abs(delta_yaw)<angle_tolerance_*M_PI/180.0){
             RCLCPP_INFO(this->get_logger(), "Goal reached");
             RCLCPP_INFO(this->get_logger(), "x: %lfcm, y: %lfcm, yaw: %lf°", x*100.0, y*100.0, delta_yaw*180/M_PI);
-            geometry_msgs::msg::PoseArray path;
-            path.header.stamp = this->now();
-            path.header.frame_id = "map";
+            path.points.clear();
             path_pub_->publish(path);   // 目標地点に到達したらpathをクリア
             goal_rcv=nullptr;
             return;
         }
 
+        geometry_msgs::msg::Point p;
         // RCLCPP_INFO(this->get_logger(), "send goal: (%f, %f),%f", goal.pose.position.x, goal.pose.position.y,get_Yaw(goal.pose.orientation)*180/M_PI);
         for (double now = resolution_; now < distance; now+=resolution_){
-            geometry_msgs::msg::Pose pose;
-            pose.position.x = current_pose_.position.x + now * dx;
-            pose.position.y = current_pose_.position.y + now * dy;
+            p.x = current_pose_.position.x + now * dx;
+            p.y = current_pose_.position.y + now * dy;
             double progress = now / distance;   // 0.0 < progress < 1.0
             double interp_velocity;
             // 進行度に応じて速度を変化させる
@@ -139,15 +146,17 @@ private:
             if(now>distance-zero_stop_) interp_velocity = 0.0;
             else if(now>distance-slow_stop_)interp_velocity = v_max * (1.0-(slow_stop_+now-distance)/(slow_stop_-zero_stop_));
             else interp_velocity = v_max;
-            pose.position.z=interp_velocity;
             // 進行度に応じてsigmoidでyawを変化させる
             double current_yaw = start_yaw + delta_yaw / (1.0 + std::exp(-7.5 * (progress - 0.5)));
             // double current_yaw = start_yaw + delta_yaw * progress;
-            pose.orientation.z = std::sin(current_yaw/2.0);
-            pose.orientation.w = std::cos(current_yaw/2.0);
-            path.poses.push_back(pose);
+            p.z=current_yaw
+            path.points.push_back(p);
+            std_msgs::msg::ColorRGBA color;
+            color.r = 1.0 - interp_velocity;
+            color.g = interp_velocity;
+            color.a = 1.0;
+            path.colors.push_back(color);
         }
-        path.poses.push_back(goal.pose); // 最後にゴールを追加
         path_pub_->publish(path);   // pathをpublish
     }
     double get_Yaw(const geometry_msgs::msg::Quaternion &q){return atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z));}
@@ -159,7 +168,7 @@ private:
     double position_tolerance_;
     double angle_tolerance_;
     geometry_msgs::msg::Pose current_pose_;
-    rclcpp::Publisher   <geometry_msgs::msg::PoseArray>::SharedPtr   path_pub_;
+    rclcpp::Publisher   <visualization_msgs::msg::Marker>::SharedPtr path_pub_;
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
     rclcpp::Publisher   <geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;

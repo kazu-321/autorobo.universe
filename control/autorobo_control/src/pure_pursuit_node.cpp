@@ -14,7 +14,7 @@
 // limitations under the License.
 
 #include "rclcpp/rclcpp.hpp"
-#include "geometry_msgs/msg/pose_array.hpp"
+#include "visualization_msgs/msg/marker.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include <tf2_ros/transform_listener.h>
@@ -23,7 +23,7 @@
 class pure_pursuit_node : public rclcpp::Node{
 public:
     pure_pursuit_node() : Node("pure_pursuit_node"){
-        path_sub_      = this->create_subscription<geometry_msgs::msg::PoseArray>  ("/planning/path", 10,
+        path_sub_      = this->create_subscription<visualization_msgs::msg::Marker>("/planning/path", 10,
                          std::bind(&pure_pursuit_node::path_callback, this, std::placeholders::_1));
         tf_buffer_     = std::make_shared         <tf2_ros::Buffer>                (this->get_clock());
         tf_listener_   = std::make_shared         <tf2_ros::TransformListener>     (*tf_buffer_);
@@ -65,7 +65,7 @@ private:
             pose.pose.orientation.z = 0.0;
             pose.pose.orientation.w = 1.0;
         }
-        if(path_.poses.size() == 0){        
+        if(path.points.size() == 0){        
             geometry_msgs::msg::Twist cmd_vel;
             cmd_vel.linear.x = 0.0;
             cmd_vel.linear.y = 0.0;
@@ -86,9 +86,9 @@ private:
         double current_y = current_pose_.position.y;
         double min_distance = std::numeric_limits<double>::max(); // 最小距離を最大で初期化
         int min_distance_index = 0; // 最小距離のインデックス
-        for (size_t i = 0; i < path_.poses.size(); ++i){
-            double dx = path_.poses[i].position.x - current_x;
-            double dy = path_.poses[i].position.y - current_y;
+        for (size_t i = 0; i < path.points.size(); ++i){
+            double dx = path.points[i].x - current_x;
+            double dy = path.points[i].y - current_y;
             double distance = std::sqrt(dx*dx + dy*dy);
             if (distance < min_distance){ // 最小距離を更新
                 min_distance = distance;
@@ -96,16 +96,15 @@ private:
             }
         }
         int min_index = min_distance_index;
-        double goal_distance=std::sqrt((path_.poses.back().position.x-current_x)*(path_.poses.back().position.x-current_x)+(path_.poses.back().position.y-current_y)*(path_.poses.back().position.y-current_y));
+        double goal_distance=std::sqrt((path.points.back().x-current_x)*(path.points.back().x-current_x)+(path.points.back().y-current_y)*(path.points.back().y-current_y));
         // look ahead distanceが最終地点よりも大きい場合は最終地点を目標とする
-        if(goal_distance<look_ahead_distance_) min_index = path_.poses.size()-1;
+        if(goal_distance<look_ahead_distance_) min_index = path.points.size()-1;
         else if(min_distance<look_ahead_distance_){
-            for(size_t i=min_index;i<path_.poses.size();i++){
-                double dx = path_.poses[i].position.x - current_x;
-                double dy = path_.poses[i].position.y - current_y;
+            for(size_t i=min_index;i<path.points.size();i++){
+                double dx = path.points[i].x - current_x;
+                double dy = path.points[i].y - current_y;
                 double distance = std::sqrt(dx*dx + dy*dy);
                 if(distance>look_ahead_distance_){ // look ahead distanceを超えたら終了
-    rclcpp::Publisher   <geometry_msgs::msg::PoseArray>::SharedPtr   path_pub_;
                     min_index = i;
                     break;
                 }
@@ -113,18 +112,16 @@ private:
         }
 
         // pure pursuit start
-        geometry_msgs::msg::Pose look_ahead_pose = path_.poses[min_index];
-        geometry_msgs::msg::Pose delta;
+        geometry_msgs::msg::Point look_ahead_point = path.points[min_index];
+        geometry_msgs::msg::Point delta;
         // Δを計算
-        delta.position.x = look_ahead_pose.position.x - current_pose_.position.x;
-        delta.position.y = look_ahead_pose.position.y - current_pose_.position.y;
-        delta.orientation.z = look_ahead_pose.orientation.z - current_pose_.orientation.z;
-        delta.orientation.w = look_ahead_pose.orientation.w - current_pose_.orientation.w;
-        double angle_map = std::atan2(delta.position.y,delta.position.x);   // 目標地点への角度を計算
+        delta.x = look_ahead_point.x - current_pose_.position.x;
+        delta.y = look_ahead_point.y - current_pose_.position.y;
+        delta.z = look_ahead_point.z - current_pose_.orientation.z;
+        double angle_map = std::atan2(delta.y,delta.x);   // 目標地点への角度を計算
         double yaw = get_yaw(current_pose_.orientation);    // 現在の角度を取得
         double angle = angle_map-yaw;  // 現在の角度から目標地点への角度を引く
-        double speed = path_.poses[min_distance_index].position.z + position_min_speed_; // 最小距離の速度を取得
-        if(speed_lookahead_) speed = look_ahead_pose.position.z + position_min_speed_;
+        double speed = path.colors[min_distance_index].g + position_min_speed_; // 最小距離の速度を取得
 
         // path_の最後とcurrentの差
         // double diff_goalx = path_.poses.back().position.x - current_x;
@@ -140,8 +137,8 @@ private:
 
         // angle P start
 
-        double target = get_yaw(path_.poses[min_distance_index].orientation);   // 最小距離の角度を取得
-        if(angle_lookahead_) target = get_yaw(look_ahead_pose.orientation);
+        double target = path.points[min_distance_index].z;   // 最小距離の角度を取得
+        if(angle_lookahead_) target = look_ahead_point.z;
         double diff_angle=target-yaw;
         while(diff_angle >  M_PI) diff_angle-=2*M_PI;   // 角度の差を-π~πにする
         while(diff_angle < -M_PI) diff_angle+=2*M_PI;
@@ -157,13 +154,16 @@ private:
         geometry_msgs::msg::PoseStamped lookahead_pose;
         lookahead_pose.header.stamp = this->now();
         lookahead_pose.header.frame_id = "map";
-        lookahead_pose.pose = look_ahead_pose;
+        lookahead_pose.pose.position = look_ahead_point;
+        lookahead_pose.pose.orientation.z=sin(look_ahead_point.z/2.0);
+        lookahead_pose.pose.orientation.w=cos(look_ahead_point.z/2.0);
+
         loopahead_pub_->publish(lookahead_pose);    // look ahead pointをパブリッシュ
 
         // RCLCPP_INFO(this->get_logger(), "angle: map:%lf, curr:%lf, delta:%lf, diff:%lf",angle_map*57.3,yaw*57.3,angle*57.3,diff_angle*57.3);
     }
     double get_yaw(const geometry_msgs::msg::Quaternion &q){return std::atan2(2.0*(q.w*q.z+q.x*q.y),1.0-2.0*(q.y*q.y+q.z*q.z));}
-    void path_callback(const geometry_msgs::msg::PoseArray::SharedPtr msg){path_=*msg;}
+    void path_callback(const visualization_msgs::msg::Marker::SharedPtr msg){path=*msg;}
     double frequency_;
     double look_ahead_distance_;
     double position_min_speed_;
@@ -171,11 +171,11 @@ private:
     double angle_min_speed_;
     bool speed_lookahead_;
     bool angle_lookahead_;
-    geometry_msgs::msg::PoseArray path_;
+    visualization_msgs::msg::Marker path;
     geometry_msgs::msg::Pose current_pose_;
     std::shared_ptr     <tf2_ros::Buffer>                            tf_buffer_;
     std::shared_ptr     <tf2_ros::TransformListener>                 tf_listener_;
-    rclcpp::Subscription<geometry_msgs::msg::PoseArray>::SharedPtr   path_sub_;
+    rclcpp::Subscription<visualization_msgs::msg::Marker>::SharedPtr path_sub_;
     rclcpp::Publisher   <geometry_msgs::msg::PoseStamped>::SharedPtr loopahead_pub_;
     rclcpp::Publisher   <geometry_msgs::msg::Twist>::SharedPtr       twist_pub_;
     rclcpp::TimerBase::SharedPtr timer_;
