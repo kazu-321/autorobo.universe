@@ -103,7 +103,7 @@ private:
         path.header.stamp = this->now();
         path.ns = "path";
         path.id = 0;
-        path.scale.x = 0.1;
+        path.scale.x = 0.2;
         path.color.a = 1.0;
 
         double x= goal.pose.position.x - current_pose_.position.x;
@@ -149,7 +149,7 @@ private:
             // 進行度に応じてsigmoidでyawを変化させる
             double current_yaw = start_yaw + delta_yaw / (1.0 + std::exp(-7.5 * (progress - 0.5)));
             // double current_yaw = start_yaw + delta_yaw * progress;
-            p.z=current_yaw
+            p.z=current_yaw;
             path.points.push_back(p);
             std_msgs::msg::ColorRGBA color;
             color.r = 1.0 - interp_velocity;
