@@ -34,7 +34,7 @@ class teleop_key(Node):
             self.twistring=Twistring()
             if key=="w":
                 self.twistring.twist.linear.x=1.0
-            elif key=="x":
+            elif key=="s":
                 self.twistring.twist.linear.x=-1.0
             elif key=="a":
                 self.twistring.twist.linear.y=1.0
@@ -61,14 +61,24 @@ class teleop_key(Node):
             print("z: {: .3f}".format(self.twistring.twist.angular.z))
             print("\033[Kcmd: "+self.twistring.cmd)
             print("navigation: "+str(self.nav_frag))
-            print("wasdxqe:move, Continue, Pause, Ok, n: nav、2,3: set pos")
+            print("wasdqe:move, Continue, Pause, Ok, n: nav、2,3: set pos")
+            self.pub.publish(self.twistring)
+        else:
+            self.twistring=Twistring()
+            print("\033[7A")
+            print("x: {: .3f}".format(self.twistring.twist.linear.x))
+            print("y: {: .3f}".format(self.twistring.twist.linear.y))
+            print("z: {: .3f}".format(self.twistring.twist.angular.z))
+            print("\033[Kcmd: "+self.twistring.cmd)
+            print("navigation: "+str(self.nav_frag))
+            print("wasdqe:move, Continue, Pause, Ok, n: nav、2,3: set pos")
             self.pub.publish(self.twistring)
 
 def main():
     print("start main")
     print("x:\ny:\nz:\ncmd:")
     print("navigation: True")
-    print("wasdxqe:move, Continue, Pause, Ok, n: nav、2,3: set pos")
+    print("wasdqe:move, Continue, Pause, Ok, n: nav、2,3: set pos")
     rclpy.init()
     node=teleop_key()
     try:
