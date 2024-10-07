@@ -1,37 +1,22 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.5)
 project(autorobo_localization)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies()
 
-# find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(sensor_msgs REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(visualization_msgs REQUIRED)
-find_package(tf2_ros REQUIRED)
-  
-add_executable(ransac_node src/ransac_node.cpp)
-target_compile_features(ransac_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
-ament_target_dependencies(ransac_node
-  rclcpp
-  sensor_msgs
-  geometry_msgs
-  visualization_msgs
-  tf2_ros)
+ament_auto_add_library(autorobo_localization SHARED
+  DIRECTORY src
+)
 
-install(TARGETS
-  ransac_node
-  DESTINATION lib/${PROJECT_NAME})
+target_include_directories(autorobo_localization
+  SYSTEM PUBLIC
+)
 
+rclcpp_components_register_node(autorobo_localization
+  PLUGIN "ransac_node::RansacNode"
+  EXECUTABLE ransac_node
+)
 
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  set(ament_cmake_copyright_FOUND TRUE)
-  set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
-endif()
-
-ament_package()
+ament_auto_package(
+  INSTALL_TO_SHARE
+)

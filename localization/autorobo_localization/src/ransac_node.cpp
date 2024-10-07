@@ -1,39 +1,18 @@
-#include <rclcpp/rclcpp.hpp>
-#include <geometry_msgs/msg/pose_stamped.hpp>
-#include <sensor_msgs/msg/laser_scan.hpp>
-#include <visualization_msgs/msg/marker.hpp>
-#include <tf2_ros/transform_broadcaster.h>
-#include <sensor_msgs/msg/point_cloud2.hpp>
-#include <sensor_msgs/point_cloud2_iterator.hpp>
+#include "autorobo_localization/ransac_node.hpp"
 
-class ransac_node : public rclcpp::Node{
-public:
-    ransac_node() : Node("ransac_node") {
+namespace ransac_node{
+    RansacNode::RansacNode(const rclcpp::NodeOptions &node_options) : rclcpp::Node("ransac_node", node_options) {
         pose_pub_     = this->create_publisher<geometry_msgs::msg::PoseStamped>("/localization/current_pose", 10);
         line_pub_     = this->create_publisher<visualization_msgs::msg::Marker>("/localization/ransac/line", 10);
         cloud_pub_    = this->create_publisher<sensor_msgs::msg::PointCloud2>("/localization/ransac/cloud", 10);
         scan_sub_     = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", rclcpp::SensorDataQoS(), 
-                        std::bind(&ransac_node::scan_callback, this, std::placeholders::_1));
+                        std::bind(&RansacNode::scan_callback, this, std::placeholders::_1));
         tf_broadcaster_  = std::make_unique<tf2_ros::TransformBroadcaster>(this);
         iter = this->declare_parameter("iter", 100);
         distance_threshold = this->declare_parameter("distance_threshold", 0.025);
-
     }
 
-private:
-    struct Point {
-        double x, y;
-    };
-
-    struct Wall{
-        Point p1, p2;
-    };
-
-    struct Line{
-        double a, b;
-    };
-
-    Line ransac(std::vector<Point> data){
+    RansacNode::Line RansacNode::ransac(std::vector<Point> data){
         if(data.size()==0){
             Line err_line;
             err_line.a=0.0;
@@ -65,7 +44,8 @@ private:
         return best_line;
     }
 
-    Wall getRL(std::vector<Point> data,Line ab,bool TB=false){
+
+    RansacNode::Wall RansacNode::getRL(std::vector<Point> data,Line ab,bool TB=false){
         double a=ab.a;
         double b=ab.b;
         Wall best_wall;
@@ -88,7 +68,7 @@ private:
         return best_wall;
     }
     
-    void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
+    void RansacNode::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
         auto start_time=this->now();
         std::vector<Point> scan_points,robot_filter,side_wall,front_wall;
         for(size_t i = 0; i < msg->ranges.size(); i++) {
@@ -244,21 +224,7 @@ private:
         cloud_pub_->publish(cloud);
     }
 
-    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr line_pub_;
-    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
-    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_pub_;
-    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-    int iter;
-    double map_resolution;
-    double distance_threshold;
-};
-
-int main(int argc, char **argv) {
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<ransac_node>());
-    rclcpp::shutdown();
-    return 0;
 }
 
-
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(ransac_node::RansacNode)
