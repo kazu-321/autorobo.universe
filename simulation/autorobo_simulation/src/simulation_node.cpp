@@ -26,13 +26,13 @@ public:
         old_x_ = this->declare_parameter<double>("start_x", 0.0);
         old_y_ = this->declare_parameter<double>("start_y", 0.0);
         lidar_err_=this->declare_parameter<double>("lidar_err",0.0);
-        angle_max_=this->declare_parameter<double>("angle_max",M_PI);
+        angle_max_=this->declare_parameter<double>("angle_max",0.0);
         angle_min_=this->declare_parameter<double>("angle_min",-M_PI);
         lidar_resolution_=this->declare_parameter<int>("lidar_resolution",180);
         lidar_freq_=this->declare_parameter<int>("lidar_freq",10);
         lidar_timer_        = this->create_wall_timer(std::chrono::milliseconds(1/lidar_freq_*1000),
                               std::bind(&OmniSim::lidarCallback, this));
-        walls_raw = declare_parameter<std::vector<double>>("walls",{0.0,0.0, 3.0,0.0, 0.0,0.0, 0.0,5.0, 0.0,5.0, 3.0,5.0});
+        walls_raw = declare_parameter<std::vector<double>>("walls",{-0.7,-0.8, 2.7,-0.8, -0.7,-0.8, -0.7,4.2, -0.7,4.2, 2.7,4.2});
         sig_     =false;
         servo_[0]=false;
         servo_[1]=false;
@@ -121,6 +121,8 @@ private:
         if(!got_tf){
             try {
                 lidar_tf_ = tf_buffer_->lookupTransform("base_link", "laser_frame", tf2::TimePointZero);
+                got_tf=true;
+                RCLCPP_INFO(this->get_logger(), "tf: x%f, y%f, z%f",lidar_tf_.transform.translation.x,lidar_tf_.transform.translation.y,get_Yaw(lidar_tf_.transform.rotation));
             }
             catch (tf2::TransformException &ex) {
                 return;
@@ -128,8 +130,7 @@ private:
         }    
         float x=lidar_tf_.transform.translation.x + x_;
         float y=lidar_tf_.transform.translation.y + y_;
-        float z= get_Yaw(lidar_tf_.transform.rotation);
-
+        float z=-get_Yaw(lidar_tf_.transform.rotation)+ z_;
 
         sensor_msgs::msg::LaserScan scan;
         scan.header.frame_id = "laser_frame";
@@ -144,7 +145,7 @@ private:
 
         for(int i=0; i<(angle_max_-angle_min_)/M_PI*lidar_resolution_; i++){
             float angle = scan.angle_min + i * scan.angle_increment + z;
-            float min_dist = scan.range_min;
+            float min_dist = std::numeric_limits<float>::infinity();
             for(const auto& wall : walls){
                 float dist = compute_ray_wall_intersection(x, y, angle, wall);
                 if (dist > scan.range_min && dist < min_dist) {
