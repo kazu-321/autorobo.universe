@@ -19,7 +19,9 @@ public:
         lidar_pub_          = this->create_publisher<sensor_msgs::msg::LaserScan>("/scan", rclcpp::SensorDataQoS());
         tf_broadcaster_     = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
         timer_              = this->create_wall_timer(std::chrono::milliseconds(50), 
-                              std::bind(&OmniSim::timerCallback, this));
+                              std::bind(&OmniSim::timerCallback, this));    
+        tf_buffer_   = std::make_shared<tf2_ros::Buffer>(this->get_clock());
+        tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
         std::srand(static_cast<unsigned int>(std::time(nullptr)));
         old_x_ = this->declare_parameter<double>("start_x", 0.0);
         old_y_ = this->declare_parameter<double>("start_y", 0.0);
@@ -36,7 +38,7 @@ public:
         servo_[1]=false;
         got_tf=false;
     
-        for(int i=0;i<walls_raw.size();i+=4){
+        for(size_t i=0;i<walls_raw.size();i+=4){
             Wall wall;
             wall.x1=walls_raw[i];
             wall.y1=walls_raw[i+1];
@@ -115,19 +117,18 @@ private:
         // RCLCPP_INFO(this->get_logger(), "x: %lf , y: %lf , z: %lf", x_, y_, z_);
     }
 
-    void send_scan(){ // get distance from robot to wall
+    void lidarCallback(){ // get distance from robot to wall
         if(!got_tf){
             try {
                 lidar_tf_ = tf_buffer_->lookupTransform("base_link", "laser_frame", tf2::TimePointZero);
             }
             catch (tf2::TransformException &ex) {
-                RCLCPP_WARN(this->get_logger(), "Could not transform base_link to laser_frame: %s", ex.what());
                 return;
             }
         }    
         float x=lidar_tf_.transform.translation.x + x_;
         float y=lidar_tf_.transform.translation.y + y_;
-        float z= get_Yaw(lidar_tf_.transform.orientation);
+        float z= get_Yaw(lidar_tf_.transform.rotation);
 
 
         sensor_msgs::msg::LaserScan scan;
@@ -152,6 +153,7 @@ private:
             }
             scan.ranges.push_back(min_dist);
         }
+        
     }
 
     float compute_ray_wall_intersection(float lx, float ly, float angle, Wall wall){
@@ -183,9 +185,11 @@ private:
     rclcpp::Publisher   <sensor_msgs::msg::LaserScan>::SharedPtr     lidar_pub_;
     std::unique_ptr     <tf2_ros::TransformBroadcaster>              tf_broadcaster_;
     rclcpp::Publisher   <geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
+    std::shared_ptr     <tf2_ros::Buffer> tf_buffer_;
+    std::shared_ptr     <tf2_ros::TransformListener> tf_listener_;
     geometry_msgs::msg::TransformStamped lidar_tf_;
     rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::TimerBase::SharedPtr timer_lidar_;
+    rclcpp::TimerBase::SharedPtr lidar_timer_;
     geometry_msgs::msg::Twist twist_sum_;
     std::vector<double> walls_raw;
     std::vector<Wall> walls;
