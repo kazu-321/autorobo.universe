@@ -153,7 +153,7 @@ private:
             }
             scan.ranges.push_back(min_dist);
         }
-        
+        lidar_pub_->publish(scan);
     }
 
     float compute_ray_wall_intersection(float lx, float ly, float angle, Wall wall){
