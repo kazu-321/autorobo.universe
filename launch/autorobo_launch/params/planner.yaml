@@ -1,7 +1,7 @@
 planner_node:
   ros__parameters:
-    slow_stop: 1.6
-    zero_stop: 0.3
+    slow_stop: 0.5
+    zero_stop: 0.0
     resolution: 0.02
     position_tolerance: 2.5
     angle_tolerance: 5.0

@@ -128,8 +128,8 @@ private:
                 return;
             }
         }    
-        float x=lidar_tf_.transform.translation.x + x_;
-        float y=lidar_tf_.transform.translation.y + y_;
+        float x=x_ + lidar_tf_.transform.translation.x*std::cos(z_) + lidar_tf_.transform.translation.y*std::sin(z_);
+        float y=y_ + lidar_tf_.transform.translation.x*std::sin(z_) + lidar_tf_.transform.translation.y*std::cos(z_);
         float z=-get_Yaw(lidar_tf_.transform.rotation)+ z_;
 
         sensor_msgs::msg::LaserScan scan;
