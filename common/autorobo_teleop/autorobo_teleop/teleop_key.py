@@ -49,6 +49,10 @@ class teleop_key(Node):
             elif key=="n":
                 self.nav_frag=not self.nav_frag
                 self.twistring.cmd="n on" if self.nav_frag else "n off"
+            elif key=="2":
+                self.twistring.cmd="set c2"
+            elif key=="3":
+                self.twistring.cmd="set c3"
             elif key in send_cmd:
                 self.twistring.cmd=key
             print("\033[7A")
