@@ -6,7 +6,6 @@
 #include "geometry_msgs/msg/transform_stamped.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
-#include "visualization_msgs/msg/marker.hpp"
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/utils.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
@@ -31,13 +30,30 @@ public:
         lidar_freq_=this->declare_parameter<int>("lidar_freq",10);
         lidar_timer_        = this->create_wall_timer(std::chrono::milliseconds(1/lidar_freq_*1000),
                               std::bind(&OmniSim::lidarCallback, this));
+        walls_raw = declare_parameter<std::vector<double>>("walls",{0.0,0.0, 3.0,0.0, 0.0,0.0, 0.0,5.0, 0.0,5.0, 3.0,5.0});
         sig_     =false;
         servo_[0]=false;
         servo_[1]=false;
         got_tf=false;
+    
+        for(int i=0;i<walls_raw.size();i+=4){
+            Wall wall;
+            wall.x1=walls_raw[i];
+            wall.y1=walls_raw[i+1];
+            wall.x2=walls_raw[i+2];
+            wall.y2=walls_raw[i+3];
+            walls.push_back(wall);
+        }
     }
 
 private:
+    struct Wall{
+        double x1;
+        double y1;
+        double x2;
+        double y2;
+    };
+
     void velocityCallback(const autorobo_msgs::msg::Twistring::SharedPtr msg) {
         count_++;
         twist_sum_.linear.x+=msg->twist.linear.x  *1.5;
@@ -100,40 +116,6 @@ private:
     }
 
     void send_scan(){ // get distance from robot to wall
-        // lidar_err_=this->get_parameter("lidar_err").as_double();
-        // float x=x_+0.7-0.5*std::cos(z_);
-        // float y=y_+0.8-0.5*std::sin(z_);
-        // float yaw=z_;
-        // float right_angle = M_PI/2+std::atan2(y,x);
-        // float left_angle  = M_PI/2-std::atan2(5.0-y,x);
-
-        // sensor_msgs::msg::LaserScan scan;
-        // scan.header.frame_id="laser_frame";
-        // scan.header.stamp=this->get_clock()->now();
-        // scan.angle_max=0;
-        // scan.angle_min=-M_PI;
-        // scan.angle_increment=M_PI/180;
-        // scan.range_max=12.0;
-        // scan.range_min=0.1;
-        // scan.scan_time=0.05;
-        // scan.time_increment=scan.scan_time/180.0;
-        // // RCLCPP_INFO(this->get_logger(),"right:%f,left%f",right_angle,left_angle);
-        // for(int i=0;i<180;i++){
-        //     float angle=i*M_PI/180;
-        //     if(angle+yaw<left_angle){
-        //         // 左側の壁
-        //         scan.ranges.push_back((5.0-y)/cosf(angle+yaw));
-        //     }else if(angle+yaw>right_angle){
-        //         // 右側の壁
-        //         scan.ranges.push_back(y/cosf(M_PI-angle-yaw));
-        //     }else{
-        //         // 前の壁
-        //         scan.ranges.push_back(x/cosf(M_PI/2-angle-yaw));
-        //     }
-        //     scan.ranges.back()+=lidar_err_*(2.0*(static_cast<double>(std::rand())/RAND_MAX)-1.0)/1000.0;
-        // }
-        // lidar_pub_->publish(scan);
-
         if(!got_tf){
             try {
                 lidar_tf_ = tf_buffer_->lookupTransform("base_link", "laser_frame", tf2::TimePointZero);
@@ -161,22 +143,52 @@ private:
 
         for(int i=0; i<(angle_max_-angle_min_)/M_PI*lidar_resolution_; i++){
             float angle = scan.angle_min + i * scan.angle_increment + z;
-            flota min_dist = scan.range_min;
+            float min_dist = scan.range_min;
             for(const auto& wall : walls){
-
+                float dist = compute_ray_wall_intersection(x, y, angle, wall);
+                if (dist > scan.range_min && dist < min_dist) {
+                    min_dist = dist;
+                }
             }
+            scan.ranges.push_back(min_dist);
         }
     }
+
+    float compute_ray_wall_intersection(float lx, float ly, float angle, Wall wall){
+        // レイの方向
+        float dx = std::cos(angle);
+        float dy = std::sin(angle);
+
+        // 壁の端点
+        float x1 = wall.x1, y1 = wall.y1;
+        float x2 = wall.x2, y2 = wall.y2;
+
+        // 2D線分とレイの交差計算（パラメトリック方程式）
+        float denominator = (x2 - x1) * dy - (y2 - y1) * dx;
+        if (std::abs(denominator) < 1e-6) {
+            return std::numeric_limits<float>::infinity();  // 平行
+        }
+
+        float t = ((lx - x1) * dy - (ly - y1) * dx) / denominator;
+        float u = ((x2 - x1) * (ly - y1) - (y2 - y1) * (lx - x1)) / denominator;
+
+        if (t >= 0.0 && t <= 1.0 && u > 0.0) {
+            return u;  // 交差点までの距離
+        }
+        return std::numeric_limits<float>::infinity();  // 交差しない
+    }
+
     double get_Yaw(const geometry_msgs::msg::Quaternion &q){return atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z));}
     rclcpp::Subscription<autorobo_msgs::msg::Twistring>::SharedPtr       twistring_subscriber_;
     rclcpp::Publisher   <sensor_msgs::msg::LaserScan>::SharedPtr     lidar_pub_;
     std::unique_ptr     <tf2_ros::TransformBroadcaster>              tf_broadcaster_;
     rclcpp::Publisher   <geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
     geometry_msgs::msg::TransformStamped lidar_tf_;
-    visualization_msgs::msg::Markre walls;
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::TimerBase::SharedPtr timer_lidar_;
     geometry_msgs::msg::Twist twist_sum_;
+    std::vector<double> walls_raw;
+    std::vector<Wall> walls;
     int count_, lidar_freq_, lidar_resolution_;
     double old_x_, old_y_, old_z_, x_, y_, z_, lidar_err_,  angle_max_, angle_min_;
     bool sig_, servo_[2], got_tf;
