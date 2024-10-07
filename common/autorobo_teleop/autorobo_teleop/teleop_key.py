@@ -68,7 +68,7 @@ def main():
     print("start main")
     print("x:\ny:\nz:\ncmd:")
     print("navigation: True")
-    print("wasd:linear, left/right:angular, c:continue, p:pause, o:ok, n: navigation")
+    print("wasdxqe:move, Continue, Pause, Ok, n: nav、2,3: set pos")
     rclpy.init()
     node=teleop_key()
     try:
