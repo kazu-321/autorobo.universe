@@ -1,19 +1,7 @@
-#include "rclcpp/rclcpp.hpp"
-#include "autorobo_msgs/msg/twistring.hpp"
-#include "tf2_ros/buffer.h"
-#include "tf2_ros/transform_listener.h"
-#include "tf2_ros/transform_broadcaster.h"
-#include "geometry_msgs/msg/transform_stamped.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "sensor_msgs/msg/laser_scan.hpp"
-#include <tf2/LinearMath/Quaternion.h>
-#include <tf2/utils.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
-#include <random>
+#include "autorobo_simulation/simulation_node.hpp"
 
-class OmniSim : public rclcpp::Node {
-public:
-    OmniSim() : Node("omni_sim_node") ,count_(0),old_x_(0.0),old_y_(0.0),old_z_(0.0),x_(0.0),y_(0.0),z_(0.0) {
+namespace simulation_node{
+    OmniSim::OmniSim(const rclcpp::NodeOptions & node_options) : rclcpp::Node("omni_sim_node") ,count_(0),old_x_(0.0),old_y_(0.0),old_z_(0.0),x_(0.0),y_(0.0),z_(0.0) {
         twistring_subscriber_= this->create_subscription<autorobo_msgs::msg::Twistring>("/R1", 10, 
                               std::bind(&OmniSim::velocityCallback, this, std::placeholders::_1));
         lidar_pub_          = this->create_publisher<sensor_msgs::msg::LaserScan>("/scan", rclcpp::SensorDataQoS());
@@ -48,15 +36,7 @@ public:
         }
     }
 
-private:
-    struct Wall{
-        double x1;
-        double y1;
-        double x2;
-        double y2;
-    };
-
-    void velocityCallback(const autorobo_msgs::msg::Twistring::SharedPtr msg) {
+    void OmniSim::velocityCallback(const autorobo_msgs::msg::Twistring::SharedPtr msg) {
         count_++;
         twist_sum_.linear.x+=msg->twist.linear.x  *1.5;
         twist_sum_.linear.y+=msg->twist.linear.y  *1.5;
@@ -69,7 +49,7 @@ private:
         if(msg->cmd=="s 1 1") servo_[1]=true;
     }
 
-    void timerCallback() {
+    void OmniSim::timerCallback() {
         // TFのブロードキャスト
         geometry_msgs::msg::TransformStamped transformStamped;
         x_=old_x_;
@@ -117,7 +97,7 @@ private:
         // RCLCPP_INFO(this->get_logger(), "x: %lf , y: %lf , z: %lf", x_, y_, z_);
     }
 
-    void lidarCallback(){ // get distance from robot to wall
+    void OmniSim::lidarCallback(){ // get distance from robot to wall
         if(!got_tf){
             try {
                 lidar_tf_ = tf_buffer_->lookupTransform("base_link", "laser_frame", tf2::TimePointZero);
@@ -157,7 +137,7 @@ private:
         lidar_pub_->publish(scan);
     }
 
-    float compute_ray_wall_intersection(float lx, float ly, float angle, Wall wall){
+    float OmniSim::compute_ray_wall_intersection(float lx, float ly, float angle, Wall wall){
         // レイの方向
         float dx = std::cos(angle);
         float dy = std::sin(angle);
@@ -181,26 +161,9 @@ private:
         return std::numeric_limits<float>::infinity();  // 交差しない
     }
 
-    double get_Yaw(const geometry_msgs::msg::Quaternion &q){return atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z));}
-    rclcpp::Subscription<autorobo_msgs::msg::Twistring>::SharedPtr       twistring_subscriber_;
-    rclcpp::Publisher   <sensor_msgs::msg::LaserScan>::SharedPtr     lidar_pub_;
-    std::unique_ptr     <tf2_ros::TransformBroadcaster>              tf_broadcaster_;
-    rclcpp::Publisher   <geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
-    std::shared_ptr     <tf2_ros::Buffer> tf_buffer_;
-    std::shared_ptr     <tf2_ros::TransformListener> tf_listener_;
-    geometry_msgs::msg::TransformStamped lidar_tf_;
-    rclcpp::TimerBase::SharedPtr timer_;
-    rclcpp::TimerBase::SharedPtr lidar_timer_;
-    geometry_msgs::msg::Twist twist_sum_;
-    std::vector<double> walls_raw;
-    std::vector<Wall> walls;
-    int count_, lidar_freq_, lidar_resolution_;
-    double old_x_, old_y_, old_z_, x_, y_, z_, lidar_err_,  angle_max_, angle_min_;
-    bool sig_, servo_[2], got_tf;
+    double OmniSim::get_Yaw(const geometry_msgs::msg::Quaternion &q){return atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z));}
+
 };
-int main(int argc, char **argv) {
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<OmniSim>());
-    rclcpp::shutdown();
-    return 0;
-}
+
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(simulation_node::OmniSim)
