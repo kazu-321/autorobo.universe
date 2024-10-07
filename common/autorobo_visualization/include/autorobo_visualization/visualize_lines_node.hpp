@@ -1,3 +1,6 @@
+#ifndef VISUALIZE_LINES_NODE_HPP
+#define VISUALIZE_LINES_NODE_HPP
+
 #include "rclcpp/rclcpp.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 
@@ -14,3 +17,5 @@ namespace visualize_lines_node{
         rclcpp::TimerBase::SharedPtr timer_;
     };
 }
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef PURE_PURSUIT_NODE_HPP
+#define PURE_PURSUIT_NODE_HPP
+
 #include "rclcpp/rclcpp.hpp"
 #include "visualization_msgs/msg/marker.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
@@ -25,3 +28,5 @@ namespace pure_pursuit_node{
         rclcpp::TimerBase::SharedPtr timer_;
     };
 }
+
+#endif

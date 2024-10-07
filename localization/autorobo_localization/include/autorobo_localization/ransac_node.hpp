@@ -1,3 +1,6 @@
+#ifndef RANSAC_NODE_HPP
+#define RANSAC_NODE_HPP
+
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
@@ -36,3 +39,5 @@ namespace ransac_node{
         double distance_threshold;
     };
 }
+
+#endif

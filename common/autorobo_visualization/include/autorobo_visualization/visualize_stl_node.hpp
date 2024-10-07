@@ -1,3 +1,5 @@
+#ifndef VISUALIZE_STL_NODE_HPP
+#define VISUALIZE_STL_NODE_HPP
 
 #include "rclcpp/rclcpp.hpp"
 #include "visualization_msgs/msg/marker.hpp"
@@ -13,3 +15,5 @@ namespace visualize_stl_node{
         rclcpp::TimerBase::SharedPtr pub_timer_;
     };
 }
+
+#endif
