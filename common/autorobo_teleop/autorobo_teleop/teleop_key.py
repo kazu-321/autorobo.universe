@@ -61,7 +61,7 @@ class teleop_key(Node):
             print("z: {: .3f}".format(self.twistring.twist.angular.z))
             print("\033[Kcmd: "+self.twistring.cmd)
             print("navigation: "+str(self.nav_frag))
-            print("wasd:linear, left/right:angular, c:continue, p:pause, o:ok, n: nav、2,3: set c2,c3")
+            print("wasdxqe:move, Continue, Pause, Ok, n: nav、2,3: set pos")
             self.pub.publish(self.twistring)
 
 def main():
