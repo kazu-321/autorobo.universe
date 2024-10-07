@@ -1,34 +1,22 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.5)
 project(autorobo_control)
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
+find_package(ament_cmake_auto REQUIRED)
+ament_auto_find_build_dependencies()
 
-# find dependencies
-find_package(ament_cmake REQUIRED)
-find_package(rclcpp REQUIRED)
-find_package(geometry_msgs REQUIRED)
-find_package(tf2_ros REQUIRED)
-find_package(visualization_msgs REQUIRED)
+ament_auto_add_library(autorobo_control SHARED
+  DIRECTORY src
+)
 
-add_executable(pure_pursuit_node src/pure_pursuit_node.cpp)
-target_compile_features(pure_pursuit_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+target_include_directories(autorobo_control
+  SYSTEM PUBLIC
+)
 
-ament_target_dependencies(pure_pursuit_node
-  rclcpp
-  geometry_msgs
-  tf2_ros
-  visualization_msgs)
+rclcpp_components_register_node(autorobo_control
+  PLUGIN "pure_pursuit_node::PurePursuitNode"
+  EXECUTABLE pure_pursuit_node
+)
 
-install(TARGETS pure_pursuit_node
-  DESTINATION lib/${PROJECT_NAME})
-
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  set(ament_cmake_copyright_FOUND TRUE)
-  set(ament_cmake_cpplint_FOUND TRUE)
-  ament_lint_auto_find_test_dependencies()
-endif()
-
-ament_package()
+ament_auto_package(
+  INSTALL_TO_SHARE
+)

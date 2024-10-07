@@ -13,25 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rclcpp/rclcpp.hpp"
-#include "visualization_msgs/msg/marker.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "geometry_msgs/msg/twist.hpp"
-#include <tf2_ros/transform_listener.h>
-#include <tf2_ros/buffer.h>
+#include "autorobo_control/pure_pursuit_node.hpp"
 
-class pure_pursuit_node : public rclcpp::Node{
-public:
-    pure_pursuit_node() : Node("pure_pursuit_node"){
+namespace pure_pursuit_node{
+    PurePursuitNode::PurePursuitNode(const rclcpp::NodeOptions &node_options) : rclcpp::Node("pure_pursuit_node",node_options){
         path_sub_      = this->create_subscription<visualization_msgs::msg::Marker>("/planning/path", 10,
-                         std::bind(&pure_pursuit_node::path_callback, this, std::placeholders::_1));
+                         std::bind(&PurePursuitNode::path_callback, this, std::placeholders::_1));
         tf_buffer_     = std::make_shared         <tf2_ros::Buffer>                (this->get_clock());
         tf_listener_   = std::make_shared         <tf2_ros::TransformListener>     (*tf_buffer_);
         twist_pub_     = this->create_publisher   <geometry_msgs::msg::Twist>      ("/cmd_vel_nav", 10);
         loopahead_pub_ = this->create_publisher   <geometry_msgs::msg::PoseStamped>("/control/lookahead_pose", 10);
         frequency_     = this->declare_parameter<double>("frequency",          20.0);
         timer_         = this->create_wall_timer(std::chrono::milliseconds((int64_t)(1.0/frequency_*1000)), 
-                         std::bind(&pure_pursuit_node::timer_callback, this));
+                         std::bind(&PurePursuitNode::timer_callback, this));
         look_ahead_distance_= this->declare_parameter<double>("look_ahead_distance", 0.5);
         position_min_speed_ = this->declare_parameter<double>("position_min_speed", 0.10);
         angle_p_            = this->declare_parameter<double>("angle_p",             1.0);
@@ -40,8 +34,7 @@ public:
         angle_lookahead_    = this->declare_parameter<bool>  ("angle_lookahead",   false);
     }
 
-private:
-    void timer_callback(){
+    void PurePursuitNode::timer_callback(){
         geometry_msgs::msg::PoseStamped pose;
         try{
             // Get current pose
@@ -162,28 +155,9 @@ private:
 
         // RCLCPP_INFO(this->get_logger(), "angle: map:%lf, curr:%lf, delta:%lf, diff:%lf",angle_map*57.3,yaw*57.3,angle*57.3,diff_angle*57.3);
     }
-    double get_yaw(const geometry_msgs::msg::Quaternion &q){return std::atan2(2.0*(q.w*q.z+q.x*q.y),1.0-2.0*(q.y*q.y+q.z*q.z));}
-    void path_callback(const visualization_msgs::msg::Marker::SharedPtr msg){path=*msg;}
-    double frequency_;
-    double look_ahead_distance_;
-    double position_min_speed_;
-    double angle_p_;
-    double angle_min_speed_;
-    bool speed_lookahead_;
-    bool angle_lookahead_;
-    visualization_msgs::msg::Marker path;
-    geometry_msgs::msg::Pose current_pose_;
-    std::shared_ptr     <tf2_ros::Buffer>                            tf_buffer_;
-    std::shared_ptr     <tf2_ros::TransformListener>                 tf_listener_;
-    rclcpp::Subscription<visualization_msgs::msg::Marker>::SharedPtr path_sub_;
-    rclcpp::Publisher   <geometry_msgs::msg::PoseStamped>::SharedPtr loopahead_pub_;
-    rclcpp::Publisher   <geometry_msgs::msg::Twist>::SharedPtr       twist_pub_;
-    rclcpp::TimerBase::SharedPtr timer_;
+    double PurePursuitNode::get_yaw(const geometry_msgs::msg::Quaternion &q){return std::atan2(2.0*(q.w*q.z+q.x*q.y),1.0-2.0*(q.y*q.y+q.z*q.z));}
+    void PurePursuitNode::path_callback(const visualization_msgs::msg::Marker::SharedPtr msg){path=*msg;}
 };
 
-int main(int argc, char ** argv){
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<pure_pursuit_node>());
-    rclcpp::shutdown();
-    return 0;
-}
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(pure_pursuit_node::PurePursuitNode)
