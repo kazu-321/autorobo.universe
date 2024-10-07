@@ -13,20 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rclcpp/rclcpp.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "geometry_msgs/msg/pose_array.hpp"
-#include "visualization_msgs/msg/marker.hpp"
-#include "geometry_msgs/msg/twist.hpp"
-#include <tf2_ros/transform_listener.h>
-#include <tf2_ros/buffer.h>
+#include "autorobo_planner/planner_node.hpp"
 
-class PlannerNode : public rclcpp::Node{
-public:
-    PlannerNode() : Node("planner_node"){
+namespace planner_node{
+    PlannerNode::PlannerNode(const rclcpp::NodeOptions &node_option) : rclcpp::Node("planner_node", node_option){
         path_pub_    = this->create_publisher<visualization_msgs::msg::Marker>("/planning/path", 10);
         goal_sub_    = this->create_subscription<geometry_msgs::msg::PoseStamped>("/goal_pose", 10,
-                       std::bind(&PlannerNode::goal_callback, this, std::placeholders::_1));
+                        std::bind(&PlannerNode::goal_callback, this, std::placeholders::_1));
         goal_pub_    = this->create_publisher<geometry_msgs::msg::PoseStamped>("/planning/goal", 10);
         err_pub_     = this->create_publisher<geometry_msgs::msg::Twist>("/planning/error", 10);
         v_max        = this->declare_parameter<double>("v_max",1.0);
@@ -36,19 +29,17 @@ public:
         tf_buffer_   = std::make_shared<tf2_ros::Buffer>(this->get_clock());
         tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
         timer_       = this->create_wall_timer(std::chrono::milliseconds((int64_t)(1.0/freq*1000)), 
-                       std::bind(&PlannerNode::timer_callback, this));
+                        std::bind(&PlannerNode::timer_callback, this));
         slow_stop_   = this->declare_parameter<double>("slow_stop",0.1);
         resolution_  = this->declare_parameter<double>("resolution",0.02);
         zero_stop_   = this->declare_parameter<double>("zero_stop",0.1);
     }
-private:
-    void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg){
-        // RCLCPP_INFO(this->get_logger(), "Received goal: (%f, %f),%f", msg->pose.position.x, msg->pose.position.y,get_Yaw(msg->pose.orientation)*180/M_PI);
+
+    void PlannerNode::goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg){
         goal_rcv=msg;
     }
-    geometry_msgs::msg::PoseStamped::SharedPtr goal_rcv;
 
-    void timer_callback(){
+    void PlannerNode::timer_callback(){
         if(goal_rcv==nullptr)return;
         geometry_msgs::msg::PoseStamped goal;
         goal.header.frame_id="map";
@@ -159,28 +150,10 @@ private:
         }
         path_pub_->publish(path);   // pathをpublish
     }
-    double get_Yaw(const geometry_msgs::msg::Quaternion &q){return atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z));}
-    double slow_stop_;
-    double resolution_;
-    double zero_stop_;
-    double v_max;
-    double freq;
-    double position_tolerance_;
-    double angle_tolerance_;
-    geometry_msgs::msg::Pose current_pose_;
-    rclcpp::Publisher   <visualization_msgs::msg::Marker>::SharedPtr path_pub_;
-    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr goal_sub_;
-    rclcpp::Publisher   <geometry_msgs::msg::PoseStamped>::SharedPtr goal_pub_;
-    rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr current_pose_sub_;
-    rclcpp::Publisher   <geometry_msgs::msg::Twist>::SharedPtr err_pub_;
-    std::shared_ptr     <tf2_ros::Buffer> tf_buffer_;
-    std::shared_ptr     <tf2_ros::TransformListener> tf_listener_;
-    rclcpp::TimerBase::SharedPtr timer_;
-};
 
-int main(int argc, char ** argv){
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<PlannerNode>());
-    rclcpp::shutdown();
-    return 0;
+    double PlannerNode::get_Yaw(const geometry_msgs::msg::Quaternion &q){return atan2(2.0 * (q.w * q.z + q.x * q.y), 1.0 - 2.0 * (q.y * q.y + q.z * q.z));}
 }
+
+
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(planner_node::PlannerNode)
