@@ -16,7 +16,7 @@
 #include "autorobo_planner/planner_node.hpp"
 
 namespace planner_node{
-    PlannerNode::PlannerNode(const rclcpp::NodeOptions &node_options) : rclcpp::Node("planner_node", node_option){
+    PlannerNode::PlannerNode(const rclcpp::NodeOptions &node_options) : rclcpp::Node("planner_node", node_options){
         path_pub_    = this->create_publisher<visualization_msgs::msg::Marker>("/planning/path", 10);
         goal_sub_    = this->create_subscription<geometry_msgs::msg::PoseStamped>("/goal_pose", 10,
                         std::bind(&PlannerNode::goal_callback, this, std::placeholders::_1));
