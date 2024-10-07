@@ -157,6 +157,11 @@ private:
         if(side_ab.b<0.0)y=-y-0.8;
         else             y=-y+4.2;
 
+        if(x < 0.0) x = 0.0;
+        if(x > 3.0) x = 3.0;
+        if(y < -0.5)y =-0.5;
+        if(y > 5.0) y = 5.0;
+
         geometry_msgs::msg::PoseStamped current_pose;
         current_pose.header.frame_id="map";
         current_pose.header.stamp=this->now();
