@@ -12,7 +12,7 @@
 namespace planner_node{
     class PlannerNode : public rclcpp::Node{
     public:
-        explicit PlannerNode(const rclcpp::NodeOptions &node_option);
+        explicit PlannerNode(const rclcpp::NodeOptions &node_options);
 
     private:
         void goal_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg);
