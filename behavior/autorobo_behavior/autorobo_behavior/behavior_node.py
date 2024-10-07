@@ -4,6 +4,7 @@ from autorobo_msgs.msg import Twistring
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import TwistStamped
+from geometry_msgs.msg import PointStamped
 from std_msgs.msg import Int8
 from std_msgs.msg import String
 import math
@@ -18,6 +19,7 @@ class BTNode(Node):
         self.msg_pub = self.create_publisher(String, '/behavior/message', 10)
         self.int_pub = self.create_publisher(Int8, '/behavior/process', 10)
         self.goal_pub= self.create_publisher(PoseStamped, '/goal_pose', 10)
+        self.p_sub   = self.create_subscription(PointStamped, '/clicked_point', self.point_callback, 10)
         self.err_sub = self.create_subscription(Twist, '/planning/error', self.err_callback, 10)
         self.twi_pub = self.create_publisher(TwistStamped, '/cmd_view',10)
         self.loop    = self.create_timer(0.05,self.loop_callback)
@@ -32,6 +34,7 @@ class BTNode(Node):
         self.cmd     = Twistring()
         self.err     = Twist()
         self.vel_nav = Twist()
+        self.p_status= "c2"
         self.c2      = 0.0
         self.c3      = 0.0
         self.declare_parameter("pos_tol",35.0)
@@ -77,11 +80,7 @@ class BTNode(Node):
         elif(cmds[0]=="team"):
             self.team = cmds[1]
         elif(cmds[0]=="set"):
-            if(cmds[1]=="c2"):
-                self.c2 = float(cmds[2])
-            elif(cmds[1]=="c3"):
-                self.c3 = float(cmds[2])
-            elif(cmds[1]=="process"):
+            if(cmds[1]=="process"):
                 if(cmds[2]=="zero"):
                     self.process = 0
                     self.forward = False
@@ -94,6 +93,8 @@ class BTNode(Node):
                 elif(cmds[2]=="c3"):
                     self.process = 22
                     self.forward = False
+            else:
+                self.p_status = cmds[1]
 
         self.send_cmd(self.cmd.cmd)
     
@@ -174,6 +175,13 @@ class BTNode(Node):
         twi.header.stamp=self.get_clock().now().to_msg()
         self.twi_pub.publish(twi)
     
+    def point_callback(self, msg):
+        y = msg.point.y
+        if(self.p_status=="c2"):
+            self.c2 = y
+        elif(self.p_status=="c3"):
+            self.c3 = y
+
     def send_goal(self, x, y):
         goal = PoseStamped()
         goal.pose.position.x = x
