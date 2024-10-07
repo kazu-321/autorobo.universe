@@ -12,16 +12,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+#include "autorobo_visualization/visualize_lines_node.hpp"
 
-#include "rclcpp/rclcpp.hpp"
-#include "visualization_msgs/msg/marker.hpp"
-
-class visualization_node : public rclcpp::Node{
-public:
-    visualization_node(const rclcpp::NodeOptions &node_option) : rclcpp::Node("visualize_lines_node", node_option){
-
+namespace visualize_lines_node{
+    VisualizeLinesNode::VisualizeLinesNode(const rclcpp::NodeOptions &node_options) : rclcpp::Node("visualize_lines_node", node_options){
         std::string name = declare_parameter<std::string>("namespace" , "area");
-
         pub_maker_ = create_publisher<visualization_msgs::msg::Marker>(
             "area/"+name, 0);
 
@@ -43,10 +38,9 @@ public:
         area_y = declare_parameter<std::vector<double>>("area.y",{0.0,1.0});
         z = declare_parameter<double>("area.z", 0.0);
         RCLCPP_INFO_STREAM(get_logger(),  "Initialize Task Done");
-        timer_ = create_wall_timer(std::chrono::milliseconds(period), std::bind(&visualization_node::timer_callback, this));
+        timer_ = create_wall_timer(std::chrono::milliseconds(period), std::bind(&VisualizeLinesNode::timer_callback, this));
     }
-private:
-    void timer_callback(){
+    void VisualizeLinesNode::timer_callback(){
         visualization_msgs::msg::Marker marker = marker_template;
         marker.header.stamp = now();
         marker.points.clear();
@@ -60,19 +54,5 @@ private:
         }
         pub_maker_->publish(marker);
     }
-    std::vector<double> area_x;
-    std::vector<double> area_y;
-    double z;
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr pub_maker_;
-    visualization_msgs::msg::Marker marker_template;
-    rclcpp::TimerBase::SharedPtr timer_;
 };
 
-int main(int argc, char *argv[]){
-    rclcpp::init(argc, argv);
-    rclcpp::NodeOptions options;
-    auto node = std::make_shared<visualization_node>(options);
-    rclcpp::spin(node);
-    rclcpp::shutdown();
-    return 0;
-}

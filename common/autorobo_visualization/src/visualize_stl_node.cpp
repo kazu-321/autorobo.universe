@@ -13,13 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "rclcpp/rclcpp.hpp"
-#include "visualization_msgs/msg/marker.hpp"
+#include "autorobo_visualization/visualize_stl_node.hpp"
 
-class visualize_stl_node : public rclcpp::Node{
-public:
-    visualize_stl_node(const rclcpp::NodeOptions &node_option)
-    : rclcpp::Node("viz_stl", node_option){
+namespace visualize_stl_node{
+    VisualizeStlNode::VisualizeStlNode(const rclcpp::NodeOptions &node_options)
+    : rclcpp::Node("viz_stl", node_options){
 
         pub_maker_ = create_publisher<visualization_msgs::msg::Marker>(
             "output/maker", 0);
@@ -60,7 +58,7 @@ public:
         marker_msg.mesh_use_embedded_materials = false;
 
         const auto period = declare_parameter<int>("publsih_rate_ms" , 1000);
-        pub_timer_  = create_wall_timer(std::chrono::milliseconds(period), std::bind(&visualize_stl_node::timer_callback, this));
+        pub_timer_  = create_wall_timer(std::chrono::milliseconds(period), std::bind(&VisualizeStlNode::timer_callback, this));
 
         RCLCPP_INFO_STREAM(get_logger(),  "ns:"<<marker_msg.ns);
         RCLCPP_INFO_STREAM(get_logger(),  "id:"<<marker_msg.id);
@@ -68,22 +66,12 @@ public:
         RCLCPP_INFO_STREAM(get_logger(),  "Initialize Task Done");
     }
 
-    void timer_callback(){
+    void VisualizeStlNode::timer_callback(){
         marker_msg.header.stamp = get_clock()->now();
         pub_maker_->publish(marker_msg);
     }
 
-private:
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr pub_maker_;
-    visualization_msgs::msg::Marker marker_msg;
-    rclcpp::TimerBase::SharedPtr pub_timer_;
 };
 
-int main(int argc, char *argv[]){
-    rclcpp::init(argc, argv);
-    rclcpp::NodeOptions options;
-    auto node = std::make_shared<visualize_stl_node>(options);
-    rclcpp::spin(node);
-    rclcpp::shutdown();
-    return 0;
-}
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(visualize_stl_node::VisualizeStlNode)
