@@ -179,8 +179,10 @@ class BTNode(Node):
         y = msg.point.y
         if(self.p_status=="c2"):
             self.c2 = y
+            self.get_logger().info("c2: "+str(y))
         elif(self.p_status=="c3"):
             self.c3 = y
+            self.get_logger().info("c3: "+str(y))
 
     def send_goal(self, x, y):
         goal = PoseStamped()
