@@ -23,15 +23,18 @@ namespace ransac_node{
             double a, b;
         };
 
-        RansacNode::Line ransac(std::vector<Point> data);
-        std::vector<Line> ransacs(std::vector<Point> data);
-        Wall RansacNode::Line2Wall(std::vector<Point> data,Line ab,bool TB)
+        RansacNode::Line ransac();
+        std::vector<Line> ransacs();
+        RansacNode::Wall Line2Wall(std::vector<Point> data,Line ab);
         void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
         rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
         rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr line_pub_;
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
         rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_pub_;
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+        std::vector<Point> data;
+        std::vector<std::vector<Point>> filtered_data;
+        std::vector<double> walls_raw;
         int iter, max_lines;
         double map_resolution;
         double distance_threshold;
