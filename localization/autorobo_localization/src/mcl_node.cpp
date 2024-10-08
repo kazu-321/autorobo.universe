@@ -8,6 +8,8 @@ namespace mcl_node{
                         std::bind(&MclNode::scan_callback, this, std::placeholders::_1));
         map_sub_      = this->create_subscription<nav_msgs::msg::OccupancyGrid>("/map", rclcpp::SensorDataQoS(), 
                         std::bind(&MclNode::map_callback, this, std::placeholders::_1));
+        init_sub_     = this->create_subscription<geometry_msgs::msg::PoseWithCovarianceStamped>("/initialpose", 10,
+                        std::bind(&MclNode::init_callback, this, std::placeholders::_1));
         tf_broadcaster_  = std::make_unique<tf2_ros::TransformBroadcaster>(this);
     }
 
@@ -17,6 +19,10 @@ namespace mcl_node{
 
     void MclNode::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg){
         // RCLCPP_INFO(this->get_logger(),"map recv");
+    }
+
+    void MclNode::init_callback(const geometry_msgs::msg::PoseWithCovarianceStamped::SharedPtr msg){
+        // RCLCPP_INFO(this->get_logger(),"init pose recv");
     }
 }
 
