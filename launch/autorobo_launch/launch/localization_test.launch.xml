@@ -10,8 +10,13 @@
         pkg="autorobo_map"
         exec="map_node"
         output="screen"/>
+    <node
+        pkg="autorobo_behavior"
+        exec="behavior_node"
+        output="screen">
+        <param name="bt_file" value="$(find-pkg-share autorobo_launch)/params/bt/default.bt"/>
+    </node>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/tf.launch.xml"/>
-    <include file="$(find-pkg-share autorobo_launch)/launch/planning.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/start_rviz.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/visualize_field.launch.xml"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/visualize_robot.launch.xml"/>
