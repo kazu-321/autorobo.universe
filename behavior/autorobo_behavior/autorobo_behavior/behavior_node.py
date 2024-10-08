@@ -36,7 +36,7 @@ class BTNode(Node):
         self.vel_nav = Twist()
         self.p_status= "c2"
         self.c2      = 0.0
-        self.c3      = 0.0
+        self.c3      = 5.0
         self.declare_parameter("pos_tol",35.0)
         self.declare_parameter("ang_tol",10.0)
         self.pos_tol = self.get_parameter("pos_tol").get_parameter_value().double_value

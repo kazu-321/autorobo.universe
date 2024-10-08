@@ -21,7 +21,7 @@ namespace simulation_node{
         lidar_timer_        = this->create_wall_timer(std::chrono::milliseconds(1/lidar_freq_*1000),
                               std::bind(&OmniSim::lidarCallback, this));
         walls_raw = declare_parameter<std::vector<double>>("walls",{-0.7,-0.8, 2.7,-0.8, -0.7,-0.8, -0.7,4.2, -0.7,4.2, 2.7,4.2});
-        sig_     =false;
+        sig_     =true;
         servo_[0]=false;
         servo_[1]=false;
         got_tf=false;
