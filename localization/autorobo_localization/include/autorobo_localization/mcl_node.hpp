@@ -14,9 +14,11 @@ namespace mcl_node{
         explicit MclNode(const rclcpp::NodeOptions &node_options);
     private:
         void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg);
+        void map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
         rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr pose_pub_;
         rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr line_pub_;
         rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
+        rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
     };
 }

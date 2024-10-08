@@ -14,6 +14,10 @@ namespace mcl_node{
     void MclNode::scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg){
         RCLCPP_INFO(this->get_logger(),"scan recv");
     }
+
+    void MclNode::map_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg){
+        RCLCPP_INFO(this->get_logger(),"map recv");
+    }
 }
 
 #include "rclcpp_components/register_node_macro.hpp"
