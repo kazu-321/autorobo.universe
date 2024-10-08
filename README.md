@@ -23,8 +23,8 @@ $ source install/setup.bash
 ```
 
 ## 実行
-terminal 0
 
+## シミュレーターの起動
 ```bash
 $ ros2 launch autorobo_launch sim.launch.xml
 ```
@@ -33,6 +33,17 @@ $ ros2 launch autorobo_launch sim.launch.xml
 子機(サル)などを一通り射出したらGoalを自分で設定できます  
 gキーを押して画面をクリックしたらそこへロボットが移動します  
 ロボットは常に前を向くようにしています  
+
+## teleop
+teleop key
+```bash
+$ ros2 run autorobo_teleop teleop_key
+```
+
+バックグラウンドteleop key
+```bash
+$ ros2 run autorobo_teleop background_key
+```
 
 
 ### teleopの操作方法
