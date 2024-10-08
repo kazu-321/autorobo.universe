@@ -16,7 +16,7 @@
         output="screen">
         <param name="bt_file" value="$(find-pkg-share autorobo_launch)/params/bt/default.bt"/>
     </node>
-    <include file="$(find-pkg-share autorobo_launch)/launch/common/tf.launch.py"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/tf.launch.xml"/>
     <node
         pkg="rviz2"
         exec="rviz2"
