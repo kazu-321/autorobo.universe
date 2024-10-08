@@ -9,8 +9,7 @@
 
 参考：[roboware-neo.universe](https://github.com/TakanoTaiga/roboware-neo.universe)
 
-
-https://github.com/user-attachments/assets/9e46a454-ef7c-4904-bd03-819eaf67d2a9
+[Screencast from 2024年10月08日 09時55分05秒.webm](https://github.com/user-attachments/assets/0d9c6c9f-2693-4511-b569-4a33ba79efcc)
 
 
 ## ビルド
@@ -24,57 +23,51 @@ $ source install/setup.bash
 ```
 
 ## 実行
-terminal 0
 
+## シミュレーターの起動
 ```bash
 $ ros2 launch autorobo_launch sim.launch.xml
 ```
 
-terminal 1
+電源オン、navオンの状態で起動します  
+子機(サル)などを一通り射出したらGoalを自分で設定できます  
+gキーを押して画面をクリックしたらそこへロボットが移動します  
+ロボットは常に前を向くようにしています  
+
+## teleop
+teleop key
 ```bash
 $ ros2 run autorobo_teleop teleop_key
 ```
-teleopが起動したら、`c`キーを入力しロボットの電源を入れます
 
-terminal 0のsigが1になったら、
+バックグラウンドteleop key
+```bash
+$ ros2 run autorobo_teleop background_key
+```
 
-`o`キーで自動運転を開始します
 
-安全のためロボット射出のタイミングなどで`o`キーの入力を必須にしています
-
-servoの0,1は射出機構のロックのon offを表しています
-
-### terminal 1の操作方法
-- cキー
-
-        - コンティニュー
-        - ロボコンのルールに基づいた遠隔非常停止解除用
-- pキー
-
-        - ポーズ
-        - サイドコンティニュー(c)すればロボットを動かせる
-- waxdキー
-
-        - 4方向移動
-        - nav offの状態じゃないと動けない
-- sキー
-
-        - ユーザー入力による移動ストップ
-- nキー
-
-        - 自動運転のon off切り替え用
-        - 最初はon
-- oキー
-
-        - 射出許可など自動運転時に安全のためにあるボタン
-        - コンティニュー&&自動運転on　ならパスが生成されたりする
+### teleopの操作方法
+- cキー  
+        - コンティニュー  
+        - ロボコンのルールに基づいた遠隔非常停止解除用  
+- pキー  
+        - ポーズ  
+        - 再度コンティニュー(c)すればロボットを動かせる  
+- waxdキー  
+        - 4方向移動  
+        - nav offの状態じゃないと動けない  
+- sキー  
+        - ユーザー入力による移動ストップ  
+- nキー  
+        - 自動運転のon off切り替え用  
+        - 最初はon  
+- oキー  
+        - 射出許可など自動運転時に安全のためにあるボタン  
+        - コンティニュー&&自動運転on　ならパスが生成されたりする  
 
 ## 未検証
-- pynputを使用したバックグラウンドキー入力
 - rosbag関係のlaunch
 - 実際に使用した慣性モデル付きのシミュレーター
-- どこまでTFに頼るべきかの実験
-- 全方位移動用MPC
 
 ## Node Graph
 ![image](./node_graph.png)

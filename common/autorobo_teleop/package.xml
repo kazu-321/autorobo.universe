@@ -15,7 +15,7 @@
   <depend>rclpy</depend>
   <depend>autorobo_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>pynput</depend>
+  <depend>python3-pynput</depend>
 
   <export>
     <build_type>ament_python</build_type>

@@ -21,7 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'teleop_key = autorobo_teleop.teleop_key:main',
-            'backgound_key = autorobo_teleop.background_key:main'
+            'background_key = autorobo_teleop.background_key:main'
         ],
     },
 )

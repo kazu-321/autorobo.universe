@@ -21,7 +21,7 @@ namespace simulation_node{
         lidar_timer_        = this->create_wall_timer(std::chrono::milliseconds(1/lidar_freq_*1000),
                               std::bind(&OmniSim::lidarCallback, this));
         walls_raw = declare_parameter<std::vector<double>>("walls",{-0.7,-0.8, 2.7,-0.8, -0.7,-0.8, -0.7,4.2, -0.7,4.2, 2.7,4.2});
-        sig_     =false;
+        sig_     =true;
         servo_[0]=false;
         servo_[1]=false;
         got_tf=false;
@@ -41,12 +41,15 @@ namespace simulation_node{
         twist_sum_.linear.x+=msg->twist.linear.x  *1.5;
         twist_sum_.linear.y+=msg->twist.linear.y  *1.5;
         twist_sum_.angular.z+=msg->twist.angular.z*1.5;
-        if(msg->cmd=="c")     sig_=true;
-        if(msg->cmd=="p")     sig_=false;
-        if(msg->cmd=="s 0 0") servo_[0]=false;
-        if(msg->cmd=="s 1 0") servo_[1]=false;
-        if(msg->cmd=="s 0 1") servo_[0]=true;
-        if(msg->cmd=="s 1 1") servo_[1]=true;
+        if(msg->cmd!=""){
+            if(msg->cmd=="c")     sig_=true;
+            if(msg->cmd=="p")     sig_=false;
+            if(msg->cmd=="s 0 0") servo_[0]=false;
+            if(msg->cmd=="s 1 0") servo_[1]=false;
+            if(msg->cmd=="s 0 1") servo_[0]=true;
+            if(msg->cmd=="s 1 1") servo_[1]=true;
+            RCLCPP_INFO(this->get_logger(), "電源: %d, 射出ロック解除: 右:%d 左:%d", sig_, servo_[0], servo_[1]);
+        }
     }
 
     void OmniSim::timerCallback() {
@@ -93,7 +96,6 @@ namespace simulation_node{
         twist_sum_.linear.y = 0;
         twist_sum_.angular.z = 0;
         count_ = 0;
-        RCLCPP_INFO(this->get_logger(),"sig: %d, servo l:%d r:%d",sig_,servo_[1],servo_[0]);
         // RCLCPP_INFO(this->get_logger(), "x: %lf , y: %lf , z: %lf", x_, y_, z_);
     }
 
