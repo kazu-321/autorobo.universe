@@ -1,0 +1,18 @@
+<launch>
+    <node
+        pkg="autorobo_simulation"
+        exec="simulation_node"/>
+    <node
+        pkg="tf2_ros"
+        exec="static_transform_publisher"
+        args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map base_link_sim"/>
+    <node
+        pkg="autorobo_map"
+        exec="map_node"
+        output="screen"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/tf.launch.xml"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/planning.launch.xml"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/start_rviz.launch.xml"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/visualize_field.launch.xml"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/visualize_robot.launch.xml"/>
+</launch>
