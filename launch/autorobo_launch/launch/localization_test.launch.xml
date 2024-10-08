@@ -17,7 +17,9 @@
         <param name="bt_file" value="$(find-pkg-share autorobo_launch)/params/bt/default.bt"/>
     </node>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/tf.launch.xml"/>
-    <include file="$(find-pkg-share autorobo_launch)/launch/common/start_rviz.launch.xml"/>
-    <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/visualize_field.launch.xml"/>
-    <include file="$(find-pkg-share autorobo_launch)/launch/common/visualization/visualize_robot.launch.xml"/>
+    <node
+        pkg="rviz2"
+        exec="rviz2"
+        args="-d $(find-pkg-share autorobo_launch)/rviz/localization_test.rviz"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/marker.launch.xml" />
 </launch>
