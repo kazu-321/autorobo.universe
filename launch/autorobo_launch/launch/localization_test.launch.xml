@@ -16,29 +16,7 @@
         output="screen">
         <param name="bt_file" value="$(find-pkg-share autorobo_launch)/params/bt/default.bt"/>
     </node>
-    <node
-        pkg="tf2_ros"
-        exec="static_transform_publisher"
-        args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 map odom"/>
-    <node
-        pkg="tf2_ros"
-        exec="static_transform_publisher"
-        args="0.0 0.0 0.0 0.0 0.0 0.0 1.0 odom base_link"/>
-    
-    <node
-        pkg="tf2_ros"
-        exec="static_transform_publisher"
-        args="-0.5 0.0 0.0 0.0 0.0 -0.707 0.707 base_link laser_frame"/>
-
-    <node
-        pkg="tf2_ros"
-        exec="static_transform_publisher"
-        args="-0.7 -0.8 0.0 0.0 0.0 0.0 1.0 map field"/>
-
-    <node
-        pkg="tf2_ros"
-        exec="static_transform_publisher"
-        args="0.0 0.0 1.0 0.0 0.0 0.0 1.0 base_link twi_view"/>
+    <include file="$(find-pkg-share autorobo_launch)/launch/common/tf.launch.xml"/>
     <node
         pkg="rviz2"
         exec="rviz2"
