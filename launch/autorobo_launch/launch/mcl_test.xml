@@ -20,6 +20,10 @@
     <node
         pkg="rviz2"
         exec="rviz2"
-        args="-d $(find-pkg-share autorobo_launch)/rviz/localization_test.rviz"/>
+        args="-d $(find-pkg-share autorobo_launch)/rviz/mcl.rviz"/>
     <include file="$(find-pkg-share autorobo_launch)/launch/common/marker.launch.xml" />
+    <node
+        pkg="autorobo_localization"
+        exec="mcl_node"
+        output="screen"/>
 </launch>
