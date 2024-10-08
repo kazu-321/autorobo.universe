@@ -9,6 +9,8 @@
 
 参考：[roboware-neo.universe](https://github.com/TakanoTaiga/roboware-neo.universe)
 
+[Screencast from 2024年10月08日 09時55分05秒.webm](https://github.com/user-attachments/assets/0d9c6c9f-2693-4511-b569-4a33ba79efcc)
+
 
 ## ビルド
 ```bash
@@ -37,7 +39,8 @@ gキーを押して画面をクリックしたらそこへロボットが移動�
 - cキー
 
         - コンティニュー
-        - ロボコンのルールに基づいた遠隔非常停止解除用
+        - ロボコンの[Screencast from 2024年10月08日 09時55分05秒.webm](https://github.com/user-attachments/assets/0db40658-3d59-4c35-be95-2c0ab48068d5)
+ルールに基づいた遠隔非常停止解除用
 - pキー
 
         - ポーズ
